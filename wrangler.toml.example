@@ -1,0 +1,8 @@
+name = "munnesir"
+compatibility_date = "2026-06-10"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "MUNNESIR_DB"
+database_name = "munnesir_db"
+database_id = "D1_DATABASE_ID_BURAYA"
