@@ -1,0 +1,1 @@
+$(sed 's/$/@@@/' /mnt/data/inspect_web/functions/_shared.js)

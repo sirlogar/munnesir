@@ -59,12 +59,17 @@ function safeEqual(a, b) {
 }
 
 export async function checkPassword(env, password) {
-  if (!password) return false;
-  if (env.MUNNESIR_PASSWORD_HASH) {
-    const incoming = await sha256Hex(password);
-    return safeEqual(incoming, env.MUNNESIR_PASSWORD_HASH);
+  const incomingPlain = String(password || '').trim();
+  if (!incomingPlain) return false;
+
+  const configuredHash = String(env.MUNNESIR_PASSWORD_HASH || '').trim();
+  if (configuredHash) {
+    const incoming = await sha256Hex(incomingPlain);
+    return safeEqual(incoming, configuredHash);
   }
-  if (env.MUNNESIR_PASSWORD) return safeEqual(password, env.MUNNESIR_PASSWORD);
+
+  const configuredPlain = String(env.MUNNESIR_PASSWORD || '').trim();
+  if (configuredPlain) return safeEqual(incomingPlain, configuredPlain);
   return false;
 }
 
