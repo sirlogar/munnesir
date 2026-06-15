@@ -1,4 +1,5 @@
 // Munnesir 1.0.1 - Cloudflare D1 tek şifreli anlık senkron
+// Otomatik senkron sessizdir; bildirim yalnızca elle senkron işlemlerinde gösterilir.
 // Web ve APK aynı API'ye bağlanır. Eski JSON yedekleri yerel import ile çalışmaya devam eder.
 (function () {
   const CONFIG_KEY = 'munnesir-cloudflare-sync-config';
@@ -227,12 +228,12 @@
     };
   }
 
-  async function applySnapshot(payload) {
+  async function applySnapshot(payload, options = {}) {
     const normalized = asPayload(payload);
     writeBooks(normalized.books);
     writeDeleted(normalized.deleted);
     if (typeof window.importJsonPayloads === 'function') {
-      await window.importJsonPayloads([{ name: 'munnesir-bulut.json', raw: normalized }], 'buluttan');
+      await window.importJsonPayloads([{ name: 'munnesir-bulut.json', raw: normalized }], 'buluttan', { silent: Boolean(options.silent) });
       const deletedIds = new Set(normalized.deleted.map((item) => item.id));
       if (deletedIds.size && typeof window.deleteMany === 'function') await window.deleteMany([...deletedIds]);
     } else if (typeof window.saveMany === 'function') {
@@ -264,7 +265,7 @@
       const local = await localSnapshot();
       const remote = await fetchCloudSnapshot();
       const merged = mergeSnapshots(local, remote.payload);
-      await applySnapshot(merged);
+      await applySnapshot(merged, { silent });
       const result = await uploadSnapshot(merged);
       lastLocalHash = await localHash();
       initialHashReady = true;
@@ -291,7 +292,7 @@
     setStatus('Bulut arşivi indiriliyor...', 'working');
     const row = await fetchCloudSnapshot();
     if (!row || !row.payload) throw new Error('Bulutta henüz Munnesir yedeği yok.');
-    await applySnapshot(row.payload);
+    await applySnapshot(row.payload, { silent: false });
     saveConfig({ revision: row.revision || 0, lastSyncAt: stamp() });
     lastLocalHash = await localHash();
     initialHashReady = true;

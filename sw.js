@@ -1,4 +1,4 @@
-const CACHE_NAME = 'munnesir-cache-1-0-1-cloudflare-d1';
+const CACHE_NAME = 'munnesir-cache-1-0-1-quiet-sync';
 const APP_SHELL = [
   './',
   './index.html',

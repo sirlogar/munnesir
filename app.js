@@ -1456,7 +1456,7 @@ function normalizeBackupPoem(p) {
   };
 }
 
-async function importJsonPayloads(items, mode = 'yedek') {
+async function importJsonPayloads(items, mode = 'yedek', options = {}) {
   const imported = [];
   for (const item of items) {
     try {
@@ -1486,13 +1486,14 @@ async function importJsonPayloads(items, mode = 'yedek') {
       console.warn('Okunamayan JSON:', item.name, err);
     }
   }
+  const silent = Boolean(options && options.silent);
   if (!imported.length) {
-    toast('Yüklenecek geçerli JSON bulunamadı.');
+    if (!silent) toast('Yüklenecek geçerli JSON bulunamadı.');
     return;
   }
   await saveMany(imported);
   await refresh();
-  toast(`${imported.length} şiir ${mode} yüklendi.`);
+  if (!silent) toast(`${imported.length} şiir ${mode} yüklendi.`);
 }
 
 async function importBackupFile(file) {
