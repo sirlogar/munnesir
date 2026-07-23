@@ -1,3 +1,20 @@
+import { state } from "./state.js";
+
+import {
+  uid,
+  nowIso,
+  normalizeText,
+  normalizePoemTags,
+  titleFromContent,
+  usecToIso,
+  backupFilename
+} from "./utils.js";
+
+import {
+  saveMany
+} from "./db.js";
+
+
 function extractKeepPoem(raw, fileName = '') {
   if (!raw || typeof raw !== 'object') return null;
   if (raw.isTrashed) return null;
@@ -97,3 +114,48 @@ async function importJsonPayloads(items, mode = 'yedek') {
 async function importBackupFile(file) {
   await importJsonPayloads([{ name: file.name, content: await file.text() }], 'yedekten');
 }
+
+function exportBackup() {
+  const payload = {
+    app: 'munnesir',
+    version: '1.0',
+    exportedAt: nowIso(),
+    poemCount: state.poems.length,
+    poems: state.poems,
+    books: state.books,
+  };
+  const json = JSON.stringify(payload, null, 2);
+  const filename = backupFilename();
+
+  if (window.AndroidBridge?.saveJsonBackup) {
+    window.AndroidBridge.saveJsonBackup(filename, json);
+    toast('Yedek kaydetme penceresi açıldı.');
+    return;
+  }
+  if (window.AndroidBridge?.saveBackup) {
+    window.AndroidBridge.saveBackup(filename, json);
+    toast('Yedek kaydetme penceresi açıldı.');
+    return;
+  }
+
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('Yedek indirildi.');
+}
+
+
+export {
+  extractKeepPoem,
+  importKeepFiles,
+  normalizeBackupPoem,
+  importJsonPayloads,
+  importBackupFile,
+  exportBackup
+};

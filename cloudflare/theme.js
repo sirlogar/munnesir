@@ -1,3 +1,6 @@
+const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+
 function applyTheme(theme) {
   const selected = ['light', 'purple', 'black'].includes(theme) ? theme : 'purple';
   document.documentElement.classList.remove('light', 'theme-light', 'theme-purple', 'theme-black');
@@ -20,3 +23,9 @@ function setupTheme() {
     els.themeDialog.close();
   }));
 }
+
+
+export {
+    applyTheme,
+    setupTheme
+};

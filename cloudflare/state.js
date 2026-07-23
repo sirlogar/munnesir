@@ -30,6 +30,6 @@ export const state = {
   bookSort: 'updatedDesc',
   bookMultiSelect: false,
   bookSelectedIds: new Set(),
-  poemFont: localStorage.getItem('munnesir-poem-font') || 'Lora',
+  poemFont: localStorage.getItem('munnesir-poem-font') || 'font-times'
   settingsPage: 'home',
 };

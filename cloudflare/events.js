@@ -1,3 +1,6 @@
+import { state } from "./state.js";
+
+
 function bindEvents() {
   els.menuBtn.addEventListener('click', toggleSidebar);
   els.closeMenuBtn.addEventListener('click', () => setSidebarOpen(false));
@@ -156,3 +159,8 @@ function bindEvents() {
   els.backupFolderInput?.addEventListener('change', async () => importFromInput(els.backupFolderInput, 'klasörden'));
   els.exportBtn.addEventListener('click', exportBackup);
 }
+
+
+export {
+  bindEvents
+};

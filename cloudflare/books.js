@@ -1,3 +1,21 @@
+import {
+  state,
+  EMPTY_TAG
+} from "./state.js";
+
+import {
+  uid,
+  nowIso,
+  normalizeText,
+  plain,
+  formatDate
+} from "./utils.js";
+
+import {
+  saveMany
+} from "./db.js";
+
+
 function ensureActiveBook() {
   if (!state.books.length) {
     const book = normalizeBook({ title: 'Kitap Adayı' });
@@ -284,3 +302,18 @@ function removePoemFromBookFromDialog() {
 
 }
 
+export {
+  ensureActiveBook,
+  bookSearchText,
+  getBookCandidates,
+  getBookCandidatePool,
+  getBookStatusCounts,
+  visibleBookPoemIds,
+  bookForPoem,
+  bookBadgeForPoem,
+  isPoemInAnotherBook,
+  renderBooksView,
+  updatePoemBookControls,
+  movePoemToBookFromDialog,
+  removePoemFromBookFromDialog
+};

@@ -1,3 +1,13 @@
+import { state } from "./state.js";
+
+import {
+  formatDate,
+  poemWordCount,
+  poemLineCount,
+  plain
+} from "./utils.js";
+
+
 function openReader(id, allowEdit = true) {
   const poem = state.poems.find((p) => p.id === id);
   if (!poem) return;
@@ -37,3 +47,9 @@ async function sharePoem(id) {
     toast('Paylaşım iptal edildi veya başarısız oldu.');
   }
 }
+
+
+export {
+  openReader,
+  sharePoem
+};

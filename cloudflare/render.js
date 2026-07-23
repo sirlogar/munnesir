@@ -1,3 +1,12 @@
+import { state } from "./state.js";
+
+import {
+  plain,
+  formatDate,
+  poemLineCount
+} from "./utils.js";
+
+
 function render() {
   renderStats();
   renderTags();
@@ -223,3 +232,15 @@ function renderActiveFilters() {
   if (state.selectedStatus !== 'all') parts.push(state.selectedStatus === 'favorite' ? 'Seçmeler' : statusLabel(state.selectedStatus));
   els.activeFilters.innerHTML = parts.map((p) => `<span class="tagChip active">${plain(p)}</span>`).join('');
 }
+
+
+export {
+  render,
+  renderStats,
+  renderTags,
+  renderStatusButtons,
+  renderSelectionBar,
+  renderNavigation,
+  renderActiveFilters,
+  renderPoems
+};

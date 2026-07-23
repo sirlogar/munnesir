@@ -1252,3 +1252,181 @@ html.theme-light .themeChoice strong,
 @media (max-width: 520px) {
   .bookBadge { max-width: 42%; }
 }
+
+
+/* ARKA PLAN KİLİTLEME (Mdd 4) */
+body.modal-open {
+  overflow: hidden !important;
+}
+
+/* SABİT SIDEBAR (Mdd 1.1, 1.2) */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  overflow-y: auto;
+  background-color: var(--bg-sidebar, #1e1e1e);
+  border-right: 1px solid var(--border-color, #333);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-header {
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--border-color, #333);
+}
+
+.brand-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+/* Times New Roman Alt Yazı (Mdd 1.4 & 5) */
+.brand-subtitle {
+  margin: 8px 0 0 0;
+  font-family: 'Tinos', 'Times New Roman', serif;
+  font-size: 0.82rem;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.main-content {
+  margin-left: 280px;
+  min-height: 100vh;
+}
+
+/* KEEP TARZI + BUTONU (Mdd 1.3) */
+.add-poem-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color, #333);
+  background: var(--bg-card, #252525);
+  color: var(--text-primary, #fff);
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* AYARLAR PANELİ (POP-UP'SIZ) (Mdd 1.5, 1.6) */
+.settings-panel {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary, #121212);
+  z-index: 2000;
+  display: none;
+  flex-direction: column;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.settings-panel.active {
+  display: flex;
+}
+
+.settings-menu-list {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+  border-bottom: 1px solid var(--border-color, #333);
+  padding-bottom: 10px;
+}
+
+.setting-item {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #aaa);
+  font-size: 1rem;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.setting-item.active {
+  color: var(--accent-color, #d4af37);
+  border-bottom: 2px solid var(--accent-color, #d4af37);
+}
+
+.sub-page { display: none; }
+.sub-page.active { display: block; }
+
+/* TAM EKRAN ŞİİR EDİTÖRÜ (Mdd 2.1) */
+.poem-editor-dialog {
+  width: 90%;
+  max-width: 900px;
+  height: 85vh;
+  border: none;
+  border-radius: 12px;
+  background: var(--bg-card, #252525);
+  color: var(--text-primary, #fff);
+  padding: 24px;
+}
+
+.poem-editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 16px;
+}
+
+.poem-title-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-color, #333);
+  color: var(--text-primary, #fff);
+  font-size: 1.3rem;
+  outline: none;
+  padding: 8px 0;
+}
+
+.poem-body-textarea {
+  flex: 1;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary, #fff);
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+}
+
+.reader-container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.reader-content {
+  white-space: pre-wrap;
+  font-size: 1.05rem; /* Ana sayfaya uygun küçültülmüş font (Mdd 2.4) */
+}
+
+/* FONT SINIFLARI (Mdd 1.8, 3) */
+.font-times { font-family: 'Tinos', 'Times New Roman', serif !important; }
+.font-roboto { font-family: 'Roboto', sans-serif !important; }
+.font-google-sans { font-family: 'Open Sans', sans-serif !important; }
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+}
