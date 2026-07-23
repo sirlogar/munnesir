@@ -1,0 +1,1538 @@
+ :root,
+:root.theme-purple {
+  color-scheme: dark;
+  --bg: #110e15;
+  --bg-soft: #19141f;
+  --bg-card: #211927;
+  --bg-card-2: #2a2032;
+  --text: #f5eff8;
+  --muted: #bcaec5;
+  --faint: #7d7087;
+  --line: rgba(255, 255, 255, 0.1);
+  --accent: #d7b1ff;
+  --accent-2: #ffd49c;
+  --danger: #ff8f8f;
+  --glow-1: rgba(215, 177, 255, 0.16);
+  --glow-2: rgba(255, 212, 156, 0.10);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+  --radius: 12px;
+}
+
+:root.light,
+:root.theme-light {
+  color-scheme: light;
+  --bg: #ffffff;
+  --bg-soft: #f7f7f7;
+  --bg-card: #ffffff;
+  --bg-card-2: #f0f0f0;
+  --text: #000000;
+  --muted: #333333;
+  --faint: #666666;
+  --line: rgba(0, 0, 0, 0.14);
+  --accent: #000000;
+  --accent-2: #444444;
+  --danger: #9d1111;
+  --glow-1: rgba(0, 0, 0, 0.00);
+  --glow-2: rgba(0, 0, 0, 0.00);
+  --shadow: 0 16px 45px rgba(0, 0, 0, 0.08);
+}
+
+:root.theme-black {
+  color-scheme: dark;
+  --bg: #000000;
+  --bg-soft: #060606;
+  --bg-card: #0b0b0b;
+  --bg-card-2: #151515;
+  --text: #ffffff;
+  --muted: #d7d7d7;
+  --faint: #8b8b8b;
+  --line: rgba(255, 255, 255, 0.16);
+  --accent: #ffffff;
+  --accent-2: #bdbdbd;
+  --danger: #ff7d7d;
+  --glow-1: rgba(255, 255, 255, 0.00);
+  --glow-2: rgba(255, 255, 255, 0.00);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.72);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  min-height: 100%;
+  margin: 0;
+  background:
+    radial-gradient(circle at 12% 0%, var(--glow-1), transparent 35%),
+    radial-gradient(circle at 92% 10%, var(--glow-2), transparent 28%),
+    var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  backdrop-filter: blur(18px);
+}
+
+.brandBlock, .topActions, .panelTitleRow, .toolbar, .dialogHeader, .dialogActions, .readerActions {
+  display: flex;
+  align-items: center;
+}
+
+.brandBlock { gap: 12px; }
+.topActions { gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+
+h1, h2, p { margin: 0; }
+h1 { font-size: clamp(1.3rem, 3vw, 2rem); letter-spacing: -0.04em; }
+#statsLine { margin-top: 4px; color: var(--muted); font-size: 0.92rem; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 22px;
+  padding: 22px;
+}
+
+.sidebar {
+  position: sticky;
+  top: 90px;
+  align-self: start;
+  display: grid;
+  gap: 14px;
+  max-height: calc(100vh - 110px);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.panel {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg-soft) 92%, transparent);
+  box-shadow: var(--shadow);
+}
+
+.panel h2 { font-size: 1rem; letter-spacing: -0.02em; }
+.panel p { color: var(--muted); line-height: 1.5; font-size: 0.9rem; margin: 8px 0 12px; }
+.panelTitleRow { justify-content: space-between; gap: 10px; }
+
+.inputLabel {
+  display: block;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-bottom: 8px;
+}
+
+.textInput, .textArea, .selectInput {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  outline: none;
+  padding: 12px 14px;
+}
+
+.textInput:focus, .textArea:focus, .selectInput:focus {
+  border-color: color-mix(in srgb, var(--accent) 70%, white 10%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.textArea {
+  min-height: 280px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.primaryBtn, .ghostBtn, .miniBtn, .iconBtn, .filterBtn, .fileBtn, .dangerBtn {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text);
+  background: var(--bg-card);
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.primaryBtn {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #19111f;
+  font-weight: 800;
+}
+
+.ghostBtn:hover, .miniBtn:hover, .iconBtn:hover, .filterBtn:hover, .fileBtn:hover, .dangerBtn:hover, .primaryBtn:hover {
+  transform: translateY(-1px);
+}
+
+.ghostBtn.full { width: 100%; margin-top: 8px; }
+.miniBtn { padding: 6px 10px; font-size: 0.8rem; }
+.iconBtn { width: 42px; height: 42px; display: grid; place-items: center; padding: 0; font-size: 1.3rem; border-radius: 10px; }
+.dangerBtn { color: var(--danger); }
+
+.fileBtn {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 800;
+}
+.fileBtn input { display: none; }
+.subtleFileBtn { color: var(--muted); font-weight: 700; }
+
+.tagCloud, .activeFilters, .readerTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tagChip {
+  border: 1px solid var(--line);
+  background: var(--bg-card);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-size: 0.86rem;
+}
+.tagChip.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 24%, var(--bg-card));
+}
+.tagCount { color: var(--faint); margin-left: 4px; }
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.filterBtn.active {
+  border-color: var(--accent-2);
+  background: color-mix(in srgb, var(--accent-2) 20%, var(--bg-card));
+}
+
+.contentArea { min-width: 0; }
+.toolbar {
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.activeFilters { margin-top: 0; }
+.activeFilters:empty::before {
+  content: "Filtre yok. Külliyat serbest dolaşımda.";
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.selectInput { max-width: 190px; }
+.fullSelect { max-width: none; margin-top: 8px; }
+
+.poemGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.poemCard {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 96%, white 2%), var(--bg-card));
+  box-shadow: var(--shadow);
+  padding: 18px;
+  min-height: 208px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+.poemCard::after {
+  content: "";
+  position: absolute;
+  inset: auto 14px 10px auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  filter: blur(6px);
+  pointer-events: none;
+}
+.poemCard h3 {
+  margin: 0;
+  font-size: 1.08rem;
+  letter-spacing: -0.03em;
+}
+.poemCard p {
+  color: var(--muted);
+  white-space: pre-wrap;
+  line-height: 1.46;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--faint);
+  font-size: 0.82rem;
+  margin-top: auto;
+}
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.smallTag {
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  background: color-mix(in srgb, var(--bg-card-2) 70%, transparent);
+}
+.cardButtons {
+  display: flex;
+  gap: 8px;
+}
+.cardButtons button { padding: 6px 9px; font-size: 0.82rem; }
+
+.emptyState {
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  padding: 40px 20px;
+  text-align: center;
+  background: color-mix(in srgb, var(--bg-soft) 72%, transparent);
+}
+.emptyState p { color: var(--muted); margin: 10px auto 18px; max-width: 480px; }
+
+.poemDialog, .readerDialog {
+  width: min(760px, calc(100vw - 22px));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0;
+  background: var(--bg-soft);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+.poemDialog::backdrop, .readerDialog::backdrop {
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(5px);
+}
+.poemForm, .readerArticle { padding: 20px; }
+.dialogHeader { justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.dialogHeader h2 { font-size: 1.3rem; }
+.poemForm .inputLabel { margin-top: 12px; }
+.formGrid { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; margin-top: 12px; }
+.checkLabel { display: flex; align-items: center; gap: 8px; padding: 12px 0; color: var(--muted); }
+.dialogActions { gap: 10px; margin: 18px 0 0; padding: 0; }
+.spacer { flex: 1; }
+
+.readerHeader { align-items: flex-start; }
+#readerMeta { color: var(--muted); margin-top: 5px; }
+.readerContent {
+  white-space: pre-wrap;
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  font-size: clamp(1.05rem, 2.5vw, 1.28rem);
+  line-height: 1.72;
+  color: var(--text);
+  margin: 20px 0;
+}
+.readerActions { justify-content: flex-end; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, 20px);
+  opacity: 0;
+  pointer-events: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  padding: 12px 16px;
+  transition: 0.2s ease;
+  z-index: 50;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.mobileOnly { display: none; }
+.mobileSidebarHeader {
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  color: var(--text);
+}
+
+@media (max-width: 820px) {
+  .topbar { padding: 14px; align-items: flex-start; }
+  .topActions { gap: 8px; }
+  .layout { grid-template-columns: 1fr; padding: 14px; }
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: min(340px, 88vw);
+    z-index: 30;
+    max-height: 100vh;
+    padding: 14px;
+    overflow: auto;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(215, 177, 255, 0.14), transparent 38%),
+      var(--bg);
+    border-right: 1px solid var(--line);
+    box-shadow: 22px 0 50px rgba(0, 0, 0, 0.38);
+    transform: translateX(-105%);
+    opacity: 1;
+    pointer-events: none;
+    transition: transform 0.22s ease;
+  }
+  .sidebar.open { transform: translateX(0); pointer-events: auto; }
+  .sidebar .panel { background: var(--bg-soft); }
+  .mobileOnly { display: grid; }
+  .toolbar { align-items: flex-start; flex-direction: column; }
+  .selectInput { max-width: none; }
+  .poemGrid { grid-template-columns: 1fr; }
+  .formGrid { grid-template-columns: 1fr; }
+  .textArea { min-height: 220px; }
+}
+
+@media (max-width: 820px) {
+  .mobileSidebarHeader.mobileOnly { display: flex; }
+}
+
+/* v3: selection, sharper geometry, alignment polish */
+:root { --radius: 8px; }
+
+.primaryBtn.modernBtn,
+.ghostBtn.modernBtn,
+#readerEditBtn,
+#savePoemBtn,
+#newPoemBtn,
+#emptyNewPoemBtn {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card-2) 86%, white 5%), var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
+  color: var(--text);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
+  font-weight: 800;
+}
+.primaryBtn.modernBtn:hover,
+.ghostBtn.modernBtn:hover,
+#readerEditBtn:hover,
+#savePoemBtn:hover,
+#newPoemBtn:hover,
+#emptyNewPoemBtn:hover {
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg-card));
+  border-color: color-mix(in srgb, var(--accent) 58%, var(--line));
+}
+.ghostBtn.modernBtn.active {
+  background: color-mix(in srgb, var(--accent) 22%, var(--bg-card));
+  border-color: var(--accent);
+}
+
+.iconBtn,
+.miniBtn,
+.filterBtn,
+.tagChip,
+.smallTag,
+.fileBtn,
+.dangerBtn,
+.textInput,
+.textArea,
+.selectInput,
+.panel,
+.poemCard,
+.toast,
+.emptyState,
+.poemDialog,
+.readerDialog {
+  border-radius: var(--radius);
+}
+
+.iconBtn,
+.miniBtn,
+.filterBtn,
+.tagChip,
+.smallTag,
+.cardButtons button,
+.dialogActions button,
+.readerActions button,
+.fileBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+}
+
+.iconBtn {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.toolbar {
+  align-items: flex-start;
+}
+.toolbarLeft {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.selectionBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg-soft) 86%, transparent);
+  box-shadow: var(--shadow);
+}
+.selectionBar[hidden] { display: none; }
+#selectionCount {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: 0 4px;
+}
+.compactDanger {
+  padding: 7px 10px;
+  font-size: 0.82rem;
+}
+.compactDanger:disabled,
+.selectionBar button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.poemCard.selectable {
+  padding-left: 52px;
+}
+.poemCard.selected {
+  border-color: color-mix(in srgb, var(--accent) 76%, var(--line));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent), var(--shadow);
+}
+.selectBox {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+}
+.selectBox input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.selectBox span {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--line);
+  background: var(--bg-card-2);
+  display: grid;
+  place-items: center;
+}
+.selectBox input:checked + span {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 30%, var(--bg-card));
+}
+.selectBox input:checked + span::after {
+  content: "✓";
+  font-size: 15px;
+  line-height: 1;
+  color: var(--text);
+  font-weight: 900;
+}
+
+.poemDialog,
+.readerDialog {
+  background: var(--bg-soft);
+}
+.poemForm,
+.readerArticle {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-soft) 96%, white 2%), var(--bg-soft));
+}
+.dialogHeader,
+.readerHeader {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 14px;
+}
+.dialogActions {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+@media (min-width: 821px) {
+  .layout {
+    grid-template-columns: minmax(260px, 300px) 1fr;
+    align-items: start;
+  }
+  .sidebar {
+    top: 86px;
+    max-height: calc(100vh - 104px);
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+  }
+  .panel {
+    padding: 14px;
+  }
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 820px) {
+  .toolbarRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .toolbarRight .selectInput,
+  .toolbarRight .modernBtn {
+    flex: 1;
+    min-width: 142px;
+  }
+  .selectionBar {
+    width: 100%;
+  }
+}
+
+
+/* APK v1 paylaşım ve hizalama cilası */
+.cardButtons { flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+.cardButtons button, .readerActions button { display: inline-grid; place-items: center; min-height: 34px; }
+.readerActions { gap: 10px; align-items: center; }
+
+
+/* v5: çoklu JSON seçim ve edit butonu renk taşması düzeltmesi */
+#readerEditBtn,
+#savePoemBtn,
+#newPoemBtn,
+#emptyNewPoemBtn,
+.primaryBtn.modernBtn,
+.ghostBtn.modernBtn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--bg-card) !important;
+  background-image: none !important;
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--line)) !important;
+  color: var(--text) !important;
+}
+#readerEditBtn::before,
+#readerEditBtn::after,
+#savePoemBtn::before,
+#savePoemBtn::after,
+#newPoemBtn::before,
+#newPoemBtn::after,
+#emptyNewPoemBtn::before,
+#emptyNewPoemBtn::after {
+  content: none !important;
+  display: none !important;
+}
+#readerEditBtn:hover,
+#savePoemBtn:hover,
+#newPoemBtn:hover,
+#emptyNewPoemBtn:hover,
+.primaryBtn.modernBtn:hover,
+.ghostBtn.modernBtn:hover {
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card)) !important;
+  border-color: color-mix(in srgb, var(--accent) 54%, var(--line)) !important;
+}
+.cardButtons button,
+.dialogActions button,
+.readerActions button {
+  appearance: none;
+  background-clip: padding-box;
+  min-width: 0;
+}
+
+/* v6: düzenle butonu düzeltmesi - pudralı beyaz taşma tamamen kapalı */
+#readerEditBtn,
+#readerEditBtn.primaryBtn,
+#readerEditBtn.primaryBtn.modernBtn {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: var(--bg-card) !important;
+  background-color: var(--bg-card) !important;
+  background-image: none !important;
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line)) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: var(--text) !important;
+  overflow: hidden !important;
+}
+#readerEditBtn:hover,
+#readerEditBtn.primaryBtn:hover,
+#readerEditBtn.primaryBtn.modernBtn:hover {
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-card)) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+
+/* v7 Munnesir: marka, ikon uyumu, güvenli ekran boşlukları ve pudra lekesi temizliği */
+html {
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+body {
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+#appShell {
+  min-height: 100dvh;
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+}
+.topbar {
+  padding-top: max(14px, env(safe-area-inset-top));
+}
+#appDescription {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+#statsLine {
+  margin-top: 6px;
+  color: var(--faint);
+}
+/* Ana sayfa düzenle butonunun yanındaki pudralı/parlak leke: kart süsü tamamen kapatıldı. */
+.poemCard::after,
+.poemCard::before,
+.cardButtons::after,
+.cardButtons::before {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+.cardButtons .miniBtn,
+.cardButtons button[data-edit],
+.cardButtons button[data-read],
+.cardButtons button[data-share] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: var(--bg-card) !important;
+  background-color: var(--bg-card) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 1px solid var(--line) !important;
+  color: var(--text) !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+.cardButtons .miniBtn:hover,
+.cardButtons button[data-edit]:hover,
+.cardButtons button[data-read]:hover,
+.cardButtons button[data-share]:hover {
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-card)) !important;
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line)) !important;
+}
+.layout {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+.contentArea {
+  padding-bottom: max(28px, env(safe-area-inset-bottom));
+}
+.poemDialog,
+.readerDialog {
+  max-height: calc(100dvh - max(28px, env(safe-area-inset-top)) - max(28px, env(safe-area-inset-bottom)));
+  overflow: auto;
+}
+.toast {
+  bottom: max(20px, env(safe-area-inset-bottom));
+}
+@media (max-width: 820px) {
+  .topbar {
+    position: sticky;
+    top: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .brandBlock {
+    align-items: flex-start;
+  }
+  .topActions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .topActions button {
+    width: 100%;
+    min-height: 42px;
+  }
+  .layout {
+    padding: 12px 12px max(34px, env(safe-area-inset-bottom));
+  }
+  .sidebar {
+    top: 0;
+    bottom: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    padding-top: max(14px, env(safe-area-inset-top));
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+  .poemGrid {
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+  .poemCard {
+    min-height: 0;
+  }
+  .cardMeta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .cardButtons {
+    width: 100%;
+    justify-content: stretch;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .cardButtons button {
+    width: 100%;
+  }
+  .readerActions,
+  .dialogActions {
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+}
+@media (max-width: 390px) {
+  .topActions,
+  .toolbarRight,
+  .cardButtons {
+    grid-template-columns: 1fr;
+  }
+  .toolbarRight {
+    display: grid;
+  }
+}
+
+
+/* v8: toplu etiket düzenleme ve etiket tahminleri */
+.tagSuggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+}
+.tagSuggestions[hidden] { display: none; }
+.tagSuggestion {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-grid;
+  place-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-card);
+  background-image: none !important;
+  color: var(--text);
+  box-shadow: none;
+  cursor: pointer;
+}
+.tagSuggestion:hover {
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-card));
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+}
+#bulkTagBtn {
+  white-space: nowrap;
+}
+
+/* v9: toplu durum düzenleme ve toplu işlem tahminleri */
+#bulkStatusBtn {
+  white-space: nowrap;
+}
+.bulkEditDescription {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: -4px 0 14px;
+  font-size: 0.92rem;
+}
+.bulkEditDialog .tagSuggestions {
+  margin-bottom: 14px;
+}
+
+/* Munnesir 1.0 geliştirme: çöp kutusu, kitap adayları, tema seçici */
+.sidebarBottomNav {
+  display: grid;
+  gap: 8px;
+  margin-top: 2px;
+}
+.sideNavBtn {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text);
+  padding: 10px 12px;
+  font-weight: 800;
+  text-align: left;
+}
+.sideNavBtn.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, var(--bg-card));
+}
+.siteLink {
+  display: block;
+  margin-top: 4px;
+  color: var(--faint);
+  text-decoration: none;
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 6px 0 2px;
+}
+.siteLink:hover { color: var(--text); text-decoration: underline; }
+
+.themeDialog {
+  width: min(520px, calc(100vw - 22px));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0;
+  background: var(--bg-soft);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+.themeDialog::backdrop {
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(5px);
+}
+.themeForm { padding: 20px; }
+.themeChoices { display: grid; gap: 10px; }
+.themeChoice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text);
+  padding: 12px;
+  text-align: center;
+}
+.themeChoice strong {
+  width: 100%;
+  text-align: center;
+}
+.themeChoice .themePreview { display: none; }
+.themeChoice.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg-card));
+}
+.themePreview {
+  width: 42px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  display: inline-block;
+}
+.lightPreview { background: linear-gradient(90deg, #fff 0 50%, #000 50%); }
+.purplePreview { background: linear-gradient(90deg, #110e15 0 50%, #d7b1ff 50%); }
+.blackPreview { background: linear-gradient(90deg, #000 0 50%, #fff 50%); }
+
+.bookWorkspace {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 16px;
+}
+.bookHeaderPanel {
+  display: grid;
+  grid-template-columns: 1fr minmax(260px, 420px);
+  gap: 16px;
+  align-items: end;
+}
+.bookCreateRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+.bookTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.bookTabs .sideNavBtn {
+  width: auto;
+  text-align: center;
+}
+.bookColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.bookPanelMain { min-width: 0; }
+.bookPoemList,
+.candidateList {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  max-height: 560px;
+  overflow: auto;
+  padding-right: 4px;
+}
+.bookPoemRow,
+.candidateRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  padding: 10px;
+}
+.bookPoemRow { grid-template-columns: 1fr auto auto; }
+.bookPoemTitle {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  padding: 0;
+  font-weight: 800;
+}
+.bookPoemRow span,
+.candidateRow span {
+  color: var(--faint);
+  font-size: 0.82rem;
+}
+.candidateRow > div { display: grid; gap: 3px; }
+.bookFilterBlock { margin-top: 12px; }
+.bookFilterBlock strong { color: var(--muted); font-size: 0.86rem; }
+.bookStatusGrid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+.restoreBtn {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+  color: var(--text);
+}
+.trashCard {
+  border-color: color-mix(in srgb, var(--danger) 28%, var(--line));
+}
+.trashEmpty { grid-column: 1 / -1; }
+
+:root.theme-light .primaryBtn,
+:root.theme-light .primaryBtn.modernBtn,
+:root.theme-light #readerEditBtn,
+:root.theme-light #savePoemBtn,
+:root.theme-light #newPoemBtn,
+:root.theme-light #emptyNewPoemBtn {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+:root.theme-black .primaryBtn,
+:root.theme-black .primaryBtn.modernBtn,
+:root.theme-black #readerEditBtn,
+:root.theme-black #savePoemBtn,
+:root.theme-black #newPoemBtn,
+:root.theme-black #emptyNewPoemBtn {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+:root.theme-light .poemCard,
+:root.theme-black .poemCard {
+  background: var(--bg-card);
+}
+:root.theme-light .poemCard::after,
+:root.theme-black .poemCard::after {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .bookHeaderPanel,
+  .bookColumns,
+  .bookCreateRow,
+  .bookPoemRow,
+  .candidateRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Munnesir 1.0 son düzen: menü sayaçları, kitap alanı ve içe aktarma düzeni */
+.sidebarHomeBtn {
+  margin-top: 10px;
+}
+
+.filterBtn,
+.bookStatusBtn {
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.filterBtn .tagCount,
+.bookStatusBtn .tagCount {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.fullBackupBtn {
+  width: 100%;
+  min-height: 42px;
+  color: var(--text);
+  font-weight: 800;
+}
+
+.sidebarBookPanel,
+.sidebarTrashPanel {
+  margin-top: 0;
+}
+
+.bookPoemList,
+.candidateList {
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.bookSelectionTools {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.bookSelectionBar {
+  width: 100%;
+  box-shadow: none;
+}
+
+#bookSelectionCount {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: 0 4px;
+}
+
+.bookPoemRow.selectable {
+  position: relative;
+  padding-left: 46px;
+}
+
+.bookPoemRow.selected {
+  border-color: color-mix(in srgb, var(--accent) 76%, var(--line));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.bookSelectBox {
+  top: 50%;
+  transform: translateY(-50%);
+  left: 12px;
+}
+
+.candidateRow .bookPoemTitle {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .bookSelectionBar {
+    align-items: stretch;
+  }
+  .bookSelectionBar button,
+  #bookMultiSelectBtn {
+    flex: 1 1 auto;
+  }
+}
+
+/* Munnesir 1.0 nokta düzeltme: kitap adaylarında seçim araçları aday listesine taşındı */
+.sidebarLooseLink {
+  margin-top: 2px;
+}
+
+.candidateRow.selectable {
+  position: relative;
+  padding-left: 46px;
+}
+
+.candidateRow.selected {
+  border-color: color-mix(in srgb, var(--accent) 76%, var(--line));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.candidateSelectionTools {
+  margin-top: 12px;
+}
+
+
+/* Munnesir 1.0 düzeltme: tema popup ikonları yok, açık tema tamamen beyaz */
+html.theme-light,
+html.theme-light body,
+html.theme-light #appShell,
+html.theme-light .layout,
+html.theme-light .contentArea {
+  background: #ffffff !important;
+}
+html.theme-light {
+  --shadow: none;
+}
+html.theme-light .sidebar,
+html.theme-light .panel,
+html.theme-light .topbar {
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+html.theme-light .themeChoice {
+  justify-content: center;
+  text-align: center;
+}
+html.theme-light .themeChoice strong,
+.themeChoice strong {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+.themePreview {
+  display: none !important;
+}
+
+
+/* Munnesir 1.0: şiir kartında kitap adayı etiketi */
+.cardTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+.cardTitleRow h3 {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.bookBadge {
+  flex: 0 0 auto;
+  max-width: 46%;
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
+  border-radius: 8px;
+  padding: 4px 8px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .bookBadge { max-width: 42%; }
+}
+
+/* Munnesir 1.0: kitap arama/sıralama, şiir düzenle kitap kutusu ve menü dokunma ayrımı */
+.bookSortSelect {
+  width: 100%;
+  max-width: none;
+  min-height: 42px;
+}
+
+.bookEditBlock {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+.bookEditBlock[hidden] { display: none; }
+.bookEditHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.bookEditHeader strong { color: var(--text); }
+.bookEditHeader span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bookEditActions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-top: 10px;
+}
+.bookEditActions button { min-height: 38px; }
+.bookEditActions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sidebar {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.sidebarBackdrop {
+  display: none;
+}
+body.sidebarOpen {
+  overflow: hidden;
+}
+
+@media (max-width: 820px) {
+  .sidebarBackdrop.open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+    background: transparent;
+    pointer-events: auto;
+    touch-action: none;
+  }
+  body.sidebarOpen #appShell {
+    overscroll-behavior: none;
+  }
+  body.sidebarOpen .topbar,
+  body.sidebarOpen .contentArea {
+    pointer-events: none;
+  }
+  body.sidebarOpen .sidebar,
+  body.sidebarOpen .sidebarBackdrop {
+    pointer-events: auto;
+  }
+  .bookEditActions {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Munnesir Web Aşama 1: masaüstü uyumu ve web içe aktarma penceresi */
+.hiddenFileInput {
+  display: none !important;
+}
+
+.importChoiceDialog .themeForm {
+  min-width: min(430px, calc(100vw - 28px));
+}
+
+.importChoices .themeChoice {
+  min-height: 48px;
+}
+
+@media (min-width: 1180px) {
+  .layout {
+    grid-template-columns: 340px minmax(0, 1fr);
+    gap: 26px;
+    padding: 26px;
+  }
+
+  .poemGrid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  .topbar {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .bookColumns {
+    grid-template-columns: minmax(360px, 0.95fr) minmax(460px, 1.15fr);
+    gap: 18px;
+  }
+}
+
+@media (min-width: 1500px) {
+  .layout {
+    grid-template-columns: 360px minmax(0, 1fr);
+  }
+
+  .poemGrid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+/* Munnesir Web Aşama 1.1: masaüstü hamburger, geniş kitap düzeni, sekme ikonu ve kaydırma düğmeleri */
+#menuBtn {
+  display: grid;
+  flex: 0 0 auto;
+}
+
+@media (min-width: 821px) {
+  .mobileSidebarHeader.mobileOnly {
+    display: none !important;
+  }
+  .layout {
+    transition: grid-template-columns 0.22s ease, padding 0.22s ease, gap 0.22s ease;
+  }
+  .sidebar {
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  body.sidebarCollapsed .layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  body.sidebarCollapsed .sidebar {
+    display: none !important;
+  }
+  body.sidebarCollapsed .contentArea {
+    width: 100%;
+  }
+}
+
+.bookStack {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.bookPanelMain {
+  width: 100%;
+}
+
+.bookPanelMain > h2,
+.bookHeaderPanel h2 {
+  letter-spacing: -0.03em;
+}
+
+.candidateList,
+.bookPoemList {
+  display: grid;
+  gap: 12px;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-right: 0 !important;
+}
+
+@media (min-width: 821px) {
+  .candidateList,
+  .bookPoemList {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    align-items: stretch;
+  }
+  .candidateRow,
+  .bookPoemRow {
+    min-height: 92px;
+    align-content: center;
+  }
+  .candidateRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .bookPoemRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .bookPoemRow .miniBtn {
+    justify-self: end;
+  }
+}
+
+.bookSelectionTools {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.scrollJump {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 45;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-card) 72%, transparent);
+  color: var(--text);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(12px);
+  opacity: 0.78;
+  font-weight: 900;
+  line-height: 1;
+}
+.scrollJump:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg-card));
+}
+.scrollJump[hidden] {
+  display: none !important;
+}
+.scrollJumpTop {
+  bottom: max(78px, calc(env(safe-area-inset-bottom) + 78px));
+}
+.scrollJumpBottom {
+  bottom: max(28px, calc(env(safe-area-inset-bottom) + 28px));
+}
+
+html.theme-light .scrollJump {
+  background: rgba(255,255,255,0.82);
+  color: #000;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.10);
+}
+html.theme-black .scrollJump {
+  background: rgba(0,0,0,0.76);
+  color: #fff;
+}
+
+@media (max-width: 820px) {
+  .scrollJump {
+    width: 36px;
+    height: 36px;
+    opacity: 0.72;
+  }
+}
+
+
+/* Bulut senkronu */
+.syncPanel .syncStatus {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  opacity: .86;
+}
+.syncStatus[data-tone="ok"] { color: var(--good, #7bd88f); }
+.syncStatus[data-tone="error"] { color: var(--danger, #ff8b8b); }
+.syncStatus[data-tone="working"] { color: var(--accent, #e6c27a); }
+.syncPanelActions,
+.syncDialogActions {
+  display: grid;
+  gap: 10px;
+}
+.syncPanelActions { grid-template-columns: 1fr; }
+.syncDialogActions { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-top: 12px; }
+.syncDialog .themeForm { max-width: 720px; }
+.syncHint {
+  margin: 14px 0 0;
+  font-size: .9rem;
+  opacity: .72;
+  line-height: 1.5;
+}
+.syncCheck { margin-top: 10px; }

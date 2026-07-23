@@ -1,0 +1,14 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.cevatkolat.siirarsivi'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.cevatkolat.siirarsivi'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '1.0'
+    }
+}

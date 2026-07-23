@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#141019" />
+  <meta name="description" content="Munnesir: hayata yeni yelkenler açmaya çalışan bir oluşum" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Munnesir</title>
+</head>
+<body>
+  <div id="appShell">
+    <header class="topbar">
+      <div class="brandBlock">
+        <button id="menuBtn" class="iconBtn mobileOnly" aria-label="Menüyü aç">☰</button>
+        <div>
+          <h1>Munnesir</h1>
+          <p id="appDescription">"hayata yeni yelkenler açmaya çalışan bir oluşum"</p>
+          <p id="statsLine">Külliyat yükleniyor...</p>
+        </div>
+      </div>
+      <div class="topActions">
+        <button id="themeToggle" class="ghostBtn" type="button">Tema</button>
+        <button id="newPoemBtn" class="primaryBtn modernBtn" type="button">+ Yeni şiir</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside id="sidebar" class="sidebar">
+        <div class="mobileSidebarHeader mobileOnly">
+          <strong>Filtreler</strong>
+          <button id="closeMenuBtn" class="iconBtn" type="button" aria-label="Menüyü kapat">×</button>
+        </div>
+        <section class="panel">
+          <label class="inputLabel" for="searchInput">Ara</label>
+          <input id="searchInput" class="textInput" type="search" placeholder="Başlık, dize, etiket..." autocomplete="off" />
+          <button id="homeViewBtn" class="ghostBtn full sidebarHomeBtn" type="button">Ana sayfa</button>
+        </section>
+
+        <section class="panel">
+          <div class="panelTitleRow">
+            <h2>Etiketler</h2>
+            <button id="clearFiltersBtn" class="miniBtn" type="button">Temizle</button>
+          </div>
+          <div id="tagCloud" class="tagCloud"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Durum</h2>
+          <div class="filterGrid">
+            <button class="filterBtn" data-status="all" type="button">Hepsi</button>
+            <button class="filterBtn" data-status="favorite" type="button">Seçmeler</button>
+            <button class="filterBtn" data-status="draft" type="button">Taslak</button>
+            <button class="filterBtn" data-status="ready" type="button">Yayına hazır</button>
+          </div>
+        </section>
+
+        <section class="panel importPanel">
+          <h2>İçe / dışa aktar</h2>
+          <p>Arşiv yedeğini tek JSON veya klasör olarak yükleyebilirsin. Şiirler cihazında kalır.</p>
+          <label class="fileBtn fullBackupBtn">
+            Arşiv yedeği yükle
+            <input id="backupImportInput" type="file" accept=".json,application/json" multiple webkitdirectory directory />
+          </label>
+          <button id="exportBtn" class="ghostBtn full" type="button">Yedek indir</button>
+        </section>
+
+        <section class="panel sidebarBottomNav sidebarBookPanel">
+          <button id="bookViewBtn" class="sideNavBtn" type="button">Kitap adayları</button>
+        </section>
+
+        <section class="panel sidebarBottomNav sidebarTrashPanel">
+          <button id="trashViewBtn" class="sideNavBtn" type="button">Çöp kutusu</button>
+        </section>
+
+        <a class="siteLink sidebarLooseLink" href="https://munnesir.com" target="_blank" rel="noopener">munnesir.com</a>
+      </aside>
+
+      <section class="contentArea">
+        <div class="toolbar">
+          <div class="toolbarLeft">
+            <div id="activeFilters" class="activeFilters"></div>
+            <div id="selectionBar" class="selectionBar" hidden>
+              <span id="selectionCount">0 seçili</span>
+              <button id="selectVisibleBtn" class="miniBtn" type="button">Görünenleri seç</button>
+              <button id="clearSelectionBtn" class="miniBtn" type="button">Seçimi temizle</button>
+              <button id="bulkTagBtn" class="miniBtn" type="button">Etiket değiştir-sil</button>
+              <button id="bulkStatusBtn" class="miniBtn" type="button">Durum değiştir-sil</button>
+              <button id="restoreSelectedBtn" class="miniBtn restoreBtn" type="button" hidden>Geri yükle</button>
+              <button id="deleteSelectedBtn" class="dangerBtn compactDanger" type="button">Seçilenleri sil</button>
+            </div>
+          </div>
+          <div class="toolbarRight">
+            <button id="multiSelectBtn" class="ghostBtn modernBtn" type="button">Çoklu seç</button>
+            <select id="sortSelect" class="selectInput" aria-label="Sıralama">
+            <option value="updatedDesc">Son düzenlenen</option>
+            <option value="createdDesc">Yeni eklenen</option>
+            <option value="titleAsc">Başlık A-Z</option>
+            <option value="lengthDesc">Uzun şiirler</option>
+            </select>
+          </div>
+        </div>
+        <div id="poemGrid" class="poemGrid"></div>
+        <div id="emptyState" class="emptyState" hidden>
+          <h2>Henüz şiir yok.</h2>
+          <p>Yeni şiir ekleyebilir veya arşiv yedeğini içe aktarabilirsin.</p>
+          <button class="primaryBtn modernBtn" id="emptyNewPoemBtn" type="button">İlk şiiri ekle</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="poemDialog" class="poemDialog">
+    <form id="poemForm" method="dialog" class="poemForm">
+      <div class="dialogHeader">
+        <h2 id="dialogTitle">Yeni şiir</h2>
+        <button class="iconBtn" type="button" id="closeDialogBtn" aria-label="Kapat">×</button>
+      </div>
+
+      <input id="poemIdInput" type="hidden" />
+
+      <label class="inputLabel" for="titleInput">Başlık</label>
+      <input id="titleInput" class="textInput" type="text" placeholder="Başlık yoksa ilk dizeyi kullanırız" />
+
+      <label class="inputLabel" for="contentInput">Şiir</label>
+      <textarea id="contentInput" class="textArea" placeholder="Dizeler buraya..." required></textarea>
+
+      <label class="inputLabel" for="tagsInput">Etiketler</label>
+      <input id="tagsInput" class="textInput" type="text" placeholder="aşk, yalnızlık, gece, seçme" />
+      <div id="tagSuggestions" class="tagSuggestions" hidden></div>
+
+      <div class="formGrid">
+        <label class="inputLabel">Durum
+          <select id="statusInput" class="selectInput fullSelect">
+            <option value="draft">Taslak</option>
+            <option value="ready">Yayına hazır</option>
+            <option value="archive">Arşiv</option>
+          </select>
+        </label>
+        <label class="checkLabel">
+          <input id="favoriteInput" type="checkbox" />
+          Seçmelere ekle
+        </label>
+      </div>
+
+      <menu class="dialogActions">
+        <button id="deletePoemBtn" class="dangerBtn" type="button">Sil</button>
+        <span class="spacer"></span>
+        <button class="ghostBtn" type="button" id="cancelDialogBtn">Vazgeç</button>
+        <button id="savePoemBtn" class="primaryBtn modernBtn" type="submit">Kaydet</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="themeDialog" class="themeDialog">
+    <form method="dialog" class="themeForm">
+      <div class="dialogHeader">
+        <h2>Tema seç</h2>
+        <button class="iconBtn" type="button" id="closeThemeBtn" aria-label="Kapat">×</button>
+      </div>
+      <div class="themeChoices">
+        <button class="themeChoice" data-theme-choice="light" type="button">
+          <strong>Açık Tema</strong>
+        </button>
+        <button class="themeChoice" data-theme-choice="purple" type="button">
+          <strong>Mor Tema</strong>
+        </button>
+        <button class="themeChoice" data-theme-choice="black" type="button">
+          <strong>Zifiri Tema</strong>
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="readerDialog" class="readerDialog">
+    <article class="readerArticle">
+      <div class="dialogHeader readerHeader">
+        <div>
+          <h2 id="readerTitle"></h2>
+          <p id="readerMeta"></p>
+        </div>
+        <button class="iconBtn" type="button" id="closeReaderBtn" aria-label="Kapat">×</button>
+      </div>
+      <div id="readerTags" class="readerTags"></div>
+      <pre id="readerContent" class="readerContent"></pre>
+      <div class="readerActions">
+        <button id="readerShareBtn" class="ghostBtn modernBtn" type="button">Paylaş</button>
+        <button id="readerEditBtn" class="primaryBtn modernBtn" type="button">Düzenle</button>
+      </div>
+    </article>
+  </dialog>
+
+
+
+  <dialog id="bulkEditDialog" class="poemDialog bulkEditDialog">
+    <form id="bulkEditForm" class="poemForm">
+      <div class="dialogHeader">
+        <h2 id="bulkEditTitle">Toplu düzenle</h2>
+        <button class="iconBtn" type="button" id="closeBulkEditBtn" aria-label="Kapat">×</button>
+      </div>
+
+      <p id="bulkEditDescription" class="bulkEditDescription"></p>
+
+      <label id="bulkRemoveLabel" class="inputLabel" for="bulkRemoveInput">Silinecek/değiştirilecek değer</label>
+      <input id="bulkRemoveInput" class="textInput" type="text" autocomplete="off" />
+      <div id="bulkRemoveSuggestions" class="tagSuggestions" hidden></div>
+
+      <label id="bulkAddLabel" class="inputLabel" for="bulkAddInput">Yeni değer</label>
+      <input id="bulkAddInput" class="textInput" type="text" autocomplete="off" />
+      <div id="bulkAddSuggestions" class="tagSuggestions" hidden></div>
+
+      <menu class="dialogActions">
+        <span class="spacer"></span>
+        <button class="ghostBtn" type="button" id="cancelBulkEditBtn">Vazgeç</button>
+        <button id="applyBulkEditBtn" class="primaryBtn modernBtn" type="submit">Uygula</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

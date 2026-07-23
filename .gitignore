@@ -1,0 +1,27 @@
+# Android
+.gradle/
+**/.gradle/
+**/build/
+local.properties
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/settings.json
+
+# Node
+node_modules/
+
+# Cloudflare
+.wrangler/state/
+
+# Secrets
+.env
+.env.*
