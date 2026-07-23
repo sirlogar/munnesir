@@ -1,5 +1,3 @@
-import { state } from "./state.js";
-
 const DB_NAME = 'munnesir-db';
 const DB_VERSION = 1;
 const STORE = 'poems';
