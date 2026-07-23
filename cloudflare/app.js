@@ -1,3 +1,5 @@
+import { state } from "./state.js";
+
 const DB_NAME = 'munnesir-db';
 const DB_VERSION = 1;
 const STORE = 'poems';
@@ -23,6 +25,8 @@ const state = {
   bookSort: 'updatedDesc',
   bookMultiSelect: false,
   bookSelectedIds: new Set(),
+  poemFont: localStorage.getItem('munnesir-poem-font') || 'Lora',
+  settingsPage: 'home',
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -31,6 +35,12 @@ const $$ = (selector) => [...document.querySelectorAll(selector)];
 const els = {
   statsLine: $('#statsLine'),
   menuBtn: $('#menuBtn'),
+  settingsBtn: $('#settingsBtn'),
+  settingsDialog: $('#settingsDialog'),
+  closeSettingsBtn: $('#closeSettingsBtn'),
+  settingsTitle: $('#settingsTitle'),
+  settingsHome: $('#settingsHome'),
+  settingsDetail: $('#settingsDetail'),
   closeMenuBtn: $('#closeMenuBtn'),
   sidebar: $('#sidebar'),
   sidebarBackdrop: $('#sidebarBackdrop'),
@@ -49,6 +59,7 @@ const els = {
   deleteSelectedBtn: $('#deleteSelectedBtn'),
   restoreSelectedBtn: $('#restoreSelectedBtn'),
   bookViewBtn: $('#bookViewBtn'),
+  sidebarBooks: $('#sidebarBooks'),
   trashViewBtn: $('#trashViewBtn'),
   poemGrid: $('#poemGrid'),
   activeFilters: $('#activeFilters'),

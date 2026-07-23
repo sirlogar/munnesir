@@ -16,16 +16,14 @@
     <header class="topbar">
       <div class="brandBlock">
         <button id="menuBtn" class="iconBtn" aria-label="Menüyü aç">☰</button>
-        <div>
-          <h1>Munnesir</h1>
+        <img class="brandLogo" src="icons/icon-192.png" alt="munnesir" />
+        <div class="brandCopy">
+          <h1>munnesir</h1>
           <p id="appDescription">"hayata yeni yelkenler açmaya çalışan bir oluşum"</p>
           <p id="statsLine">Külliyat yükleniyor...</p>
         </div>
       </div>
-      <div class="topActions">
-        <button id="themeToggle" class="ghostBtn" type="button">Tema</button>
-        <button id="newPoemBtn" class="primaryBtn modernBtn" type="button">+ Yeni şiir</button>
-      </div>
+      <button id="settingsBtn" class="iconBtn settingsBtn" type="button" aria-label="Ayarlar">⚙</button>
     </header>
 
     <main class="layout">
@@ -58,17 +56,9 @@
           </div>
         </section>
 
-        <section class="panel importPanel">
-          <h2>İçe / dışa aktar</h2>
-          <p>Arşiv yedeğini tek JSON veya klasör olarak yükleyebilirsin. Şiirler cihazında kalır.</p>
-          <button id="backupImportBtn" class="fileBtn fullBackupBtn" type="button">Arşiv yedeği yükle</button>
-          <input id="backupFileInput" class="hiddenFileInput" type="file" accept=".json,application/json" multiple />
-          <input id="backupFolderInput" class="hiddenFileInput" type="file" accept=".json,application/json" multiple webkitdirectory directory />
-          <button id="exportBtn" class="ghostBtn full" type="button">Yedek indir</button>
-        </section>
-
         <section class="panel sidebarBottomNav sidebarBookPanel">
           <button id="bookViewBtn" class="sideNavBtn" type="button">Kitap adayları</button>
+          <div id="sidebarBooks" class="sidebarBooks"></div>
         </section>
 
         <section class="panel sidebarBottomNav sidebarTrashPanel">
@@ -112,6 +102,32 @@
       </section>
     </main>
   </div>
+
+  <button id="newPoemBtn" class="fab" type="button" aria-label="Yeni şiir ekle">+</button>
+
+  <dialog id="settingsDialog" class="settingsDialog">
+    <section class="settingsPage">
+      <div class="dialogHeader">
+        <div>
+          <p class="eyebrow">munnesir v1.1</p>
+          <h2 id="settingsTitle">Ayarlar</h2>
+        </div>
+        <button id="closeSettingsBtn" class="iconBtn" type="button" aria-label="Kapat">×</button>
+      </div>
+      <div id="settingsHome" class="settingsList">
+        <button class="settingsRow" data-settings-page="theme" type="button">Tema <span>›</span></button>
+        <button class="settingsRow" data-settings-page="font" type="button">Font <span>›</span></button>
+        <button class="settingsRow" data-settings-page="sync" type="button">Senkronizasyon <span>›</span></button>
+        <button class="settingsRow" data-settings-page="transfer" type="button">İçe / dışa aktar <span>›</span></button>
+        <button class="settingsRow" data-settings-page="about" type="button">Hakkında <span>›</span></button>
+      </div>
+      <div id="settingsDetail" class="settingsDetail" hidden></div>
+      <button id="backupImportBtn" type="button" hidden></button>
+      <button id="exportBtn" type="button" hidden></button>
+      <input id="backupFileInput" class="hiddenFileInput" type="file" accept=".json,application/json" multiple />
+      <input id="backupFolderInput" class="hiddenFileInput" type="file" accept=".json,application/json" multiple webkitdirectory directory />
+    </section>
+  </dialog>
 
   <dialog id="poemDialog" class="poemDialog">
     <form id="poemForm" method="dialog" class="poemForm">
