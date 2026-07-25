@@ -58,6 +58,23 @@
     });
   }
 
+
+  function getPoemDate(p) {
+    // Öncelik 1: Şiirin asıl ilk oluşturulma tarihi (createdAt)
+    // Öncelik 2: Güncelleme tarihi (updatedAt)
+    const rawDate = p.createdAt || p.updatedAt;
+    if (!rawDate) return '';
+    
+    const d = new Date(rawDate);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('tr-TR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+
   function formatDate(dStr) {
     if (!dStr) return '';
     const d = new Date(dStr);
@@ -132,14 +149,15 @@
       );
     }
 
-    // SIRALAMA ALGORİTMASI
+    // SIRALAMA ALGORİTMASI (Ezilmemiş Oluşturulma Tarihine Göre)
     list.sort((a, b) => {
       if (state.sortOrder === 'titleAsc') {
         return (a.title || '').localeCompare(b.title || '', 'tr');
-      } else if (state.sortOrder === 'createdDesc') {
-        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
       } else {
-        return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+        // En yeni oluşturulan en üstte
+        const dateA = new Date(a.createdAt || a.updatedAt || 0);
+        const dateB = new Date(b.createdAt || b.updatedAt || 0);
+        return dateB - dateA;
       }
     });
 
@@ -158,7 +176,7 @@
       <article class="poemCard" data-id="${p.id}">
         <h3>${p.favorite ? '★ ' : ''}${plain(p.title)}</h3>
         <p class="${state.poemFont}">${plain(p.content).slice(0, 150)}...</p>
-        <span style="font-size:0.8rem; opacity:0.6;">${formatDate(p.updatedAt)}</span>
+        <span style="font-size:0.8rem; opacity:0.6;">${getPoemDate(p)}</span>
       </article>
     `).join('');
 
