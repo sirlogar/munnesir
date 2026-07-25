@@ -219,9 +219,51 @@
       await refresh();
     });
 
-    $('#bookViewBtn')?.addEventListener('click', () => $('#bookDialog')?.showModal());
+    // KİTAP ADAYLARI DÜZELTME (Hem localStorage hem de Şiir Niteliklerini Okur)
+    $('#bookViewBtn')?.addEventListener('click', () => {
+      // 1. localStorage'daki kaydedilmiş kitap yapılarını oku
+      const localBooks = JSON.parse(localStorage.getItem('munnesir-books') || '[]');
+      const bookPoemIds = new Set();
+      localBooks.forEach(b => (b.poemIds || []).forEach(id => bookPoemIds.add(id)));
+
+      // 2. Hem objesinde işaretli olanları hem de kitap listesinde geçenleri filtrele
+      const books = state.poems.filter(p => p.isBookCandidate || bookPoemIds.has(p.id));
+      const container = $('#bookListContainer');
+
+      if (books.length) {
+        container.innerHTML = books.map(b => `
+          <div style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+            <span>• ${plain(b.title)}</span>
+            <span style="font-size: 0.8rem; opacity: 0.6;">${formatDate(b.updatedAt)}</span>
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = '<p>Henüz kitap adayı olarak işaretlenmiş bir çalışma bulunamadı.</p>';
+      }
+      $('#bookDialog')?.showModal();
+    });
+    
     $('#closeBookBtn')?.addEventListener('click', () => $('#bookDialog')?.close());
-    $('#trashViewBtn')?.addEventListener('click', () => $('#trashDialog')?.showModal());
+    
+    // ÇÖP KUTUSU DÜZELTME (trashedAt VEYA status === 'trash' Olanları Okur)
+    $('#trashViewBtn')?.addEventListener('click', () => {
+      // Hem trashedAt tarihi olanları hem de status alanı 'trash' veya 'deleted' yapılmış olanları yakala
+      const trashed = state.poems.filter(p => p.trashedAt || p.status === 'trash' || p.status === 'deleted');
+      const container = $('#trashListContainer');
+
+      if (trashed.length) {
+        container.innerHTML = trashed.map(t => `
+          <div style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+            <span>• ${plain(t.title)}</span>
+            <span style="font-size: 0.8rem; color: #ef4444;">Silindi</span>
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = '<p>Çöp kutusu boş.</p>';
+      }
+      $('#trashDialog')?.showModal();
+    });
+
     $('#closeTrashBtn')?.addEventListener('click', () => $('#trashDialog')?.close());
     $('#settingsOpenBtn')?.addEventListener('click', () => $('#settingsDialog')?.showModal());
     $('#closeSettingsBtn')?.addEventListener('click', () => $('#settingsDialog')?.close());
