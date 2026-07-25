@@ -219,7 +219,7 @@
       await refresh();
     });
 
-    
+
     // KİTAP ADAYLARI
     $('#bookViewBtn')?.addEventListener('click', () => {
       const localBooks = JSON.parse(localStorage.getItem('munnesir-books') || '[]');
@@ -295,9 +295,38 @@
     await refresh();
   });
 
-  // SYNC.JS BAĞLANTILARI
+
+  // SYNC.JS KÖPRÜ FONKSİYONLARI (ŞİİRİ EKRANA DÖKEN KISIM)
   window.getAllPoems = getAllPoems;
   window.savePoem = savePoemToDB;
   window.refresh = refresh;
   window.refreshAll = refresh;
+
+  // Sync.js veriyi toplu indirdiğinde burayı çağırır:
+  window.saveMany = async function(poems) {
+    if (!db || !Array.isArray(poems)) return;
+    const tx = db.transaction('poems', 'readwrite');
+    const store = tx.objectStore('poems');
+    poems.forEach(p => store.put(p));
+    return new Promise((resolve) => {
+      tx.oncomplete = () => {
+        refresh();
+        resolve();
+      };
+    });
+  };
+
+  // Sync.js JSON yedek veya bulut snapshot'ı indirdiğinde burayı çağırır:
+  window.importJsonPayloads = async function(payloads) {
+    if (!payloads || !payloads.length) return;
+    for (const item of payloads) {
+      const raw = item.raw || item;
+      const poems = raw.poems || (Array.isArray(raw) ? raw : []);
+      if (poems.length) {
+        await window.saveMany(poems);
+      }
+    }
+    await refresh();
+  };
+
 })();
