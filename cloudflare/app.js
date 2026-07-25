@@ -199,11 +199,6 @@
       $('#sidebar')?.classList.toggle('open');
     });
 
-    $('#searchInput')?.addEventListener('input', (e) => {
-      state.searchQuery = e.target.value.trim();
-      renderFeed();
-    });
-
     $('#newPoemFabBtn')?.addEventListener('click', () => openEditor());
     $('#closePoemBtn')?.addEventListener('click', () => $('#poemDialog')?.close());
 
@@ -228,6 +223,28 @@
     $('#closeSyncAdvBtn')?.addEventListener('click', () => {
       $('#syncAdvDialog')?.close();
     });
+
+    // AUTOFILL (OTOMATİK DOLDURMA) ENGELLEMELİ ARAMA
+    const searchEl = $('#searchInput');
+    if (searchEl) {
+      // Sayfa ilk açıldığında tarayıcı otomatik doldurduysa temizle
+      if (searchEl.value.includes('http') || searchEl.value.includes('munnesir')) {
+        searchEl.value = '';
+        state.searchQuery = '';
+      }
+
+      searchEl.addEventListener('input', (e) => {
+        // Eğer kullanıcı kendisi odaklanıp yazmadıysa (autofill sapmasıysa) temizle
+        if (e.target.value.includes('http://') || e.target.value.includes('https://')) {
+          e.target.value = '';
+          state.searchQuery = '';
+          renderFeed();
+          return;
+        }
+        state.searchQuery = e.target.value.trim();
+        renderFeed();
+      });
+    }
 
     // ARKA PLANA TIKLANINCA EDİTÖRÜN KAPANMASINI ENGELLEME
     const poemDlg = $('#poemDialog');
