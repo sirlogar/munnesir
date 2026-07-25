@@ -11,9 +11,9 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Tinos:ital,wght@0,400;0,700;1,400&family=Open+Sans:wght@400;600&display=swap">
 </head>
-<body>
+<body class="theme-purple">
 
-  <!-- 3. EN ÜST SABİT HEADER (Logo ve Başlık Hamburger Menüden Ayrı En Üstte) -->
+  <!-- EN ÜST SABİT BANT (Logo & Munnesir Yazısı) -->
   <header class="topBanner">
     <div class="bannerLeft">
       <button id="sidebarToggle" class="iconBtn" type="button" aria-label="Menü">☰</button>
@@ -59,7 +59,7 @@
     </aside>
 
     <!-- ANA İÇERİK -->
-    <main class="mainContent">
+    <main class="mainContent" id="mainContent">
       <div class="contentHeader">
         <span id="statsLine">0 şiir</span>
       </div>
@@ -72,7 +72,7 @@
     </main>
   </div>
 
-  <!-- 3.a GOOGLE KEEP USULÜ FLOATING (+ / YENİ ŞİİR) BUTONU -->
+  <!-- GOOGLE KEEP USULÜ SAĞ ALTTEKİ + BUTONU -->
   <button id="newPoemFabBtn" class="fabBtn" type="button" title="Yeni Şiir Ekle">+</button>
 
   <!-- AYARLAR POP-UP -->
@@ -93,7 +93,7 @@
     </div>
   </dialog>
 
-  <!-- 4. KİTAP ADAYLARI POP-UP -->
+  <!-- KİTAP ADAYLARI POP-UP -->
   <dialog id="bookDialog" class="modalDialog">
     <div class="modalContainer">
       <div class="modalHeader">
@@ -101,12 +101,12 @@
         <button id="closeBookBtn" class="iconBtn" type="button">✕</button>
       </div>
       <div class="modalBody" id="bookListContainer">
-        <p>Henüz kitap adayı olarak işaretlenmiş bir çalışma yok.</p>
+        <p>Henüz kitap adayı eklenmemiş.</p>
       </div>
     </div>
   </dialog>
 
-  <!-- 4. ÇÖP KUTUSU POP-UP -->
+  <!-- ÇÖP KUTUSU POP-UP -->
   <dialog id="trashDialog" class="modalDialog">
     <div class="modalContainer">
       <div class="modalHeader">
@@ -119,7 +119,7 @@
     </div>
   </dialog>
 
-  <!-- ŞİİR YAZMA EDITÖRÜ -->
+  <!-- ŞİİR YAZMA EDİTÖRÜ -->
   <dialog id="poemDialog" class="modalDialog">
     <form method="dialog" id="poemForm" class="modalContainer">
       <div class="modalHeader">

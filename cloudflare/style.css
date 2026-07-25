@@ -1,20 +1,47 @@
+:root, html.theme-purple {
+  --bg-primary: #121218;
+  --bg-sidebar: #1a1a24;
+  --bg-card: #232330;
+  --text-primary: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.12);
+  --accent-color: #a855f7;
+}
+
+html.theme-light {
+  --bg-primary: #f4f4f9;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #1e1e2d;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --accent-color: #7c3aed;
+}
+
+html.theme-black {
+  --bg-primary: #000000;
+  --bg-sidebar: #0a0a0a;
+  --bg-card: #121212;
+  --text-primary: #e5e5e5;
+  --border-color: rgba(255, 255, 255, 0.15);
+  --accent-color: #9333ea;
+}
+
 body {
   margin: 0;
   padding: 0;
-  background: var(--bg-primary, #121218);
-  color: var(--text-primary, #ffffff);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Roboto', sans-serif;
   overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* 1. BÜTÜNSEL, OVAL VE EŞİT BUTON DÜZENİ */
 .stdBtn {
   height: 42px;
   padding: 0 16px;
   border-radius: 12px;
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border-color);
   background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary, #fff);
+  color: var(--text-primary);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -27,33 +54,26 @@ body {
 
 .stdBtn:hover {
   background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--accent-color);
 }
 
 .stdBtn.active {
-  background: var(--accent-color, #a855f7);
-  border-color: var(--accent-color, #a855f7);
+  background: var(--accent-color);
+  border-color: var(--accent-color);
   color: #fff;
 }
 
-.stdBtn.full {
-  width: 100%;
-}
+.stdBtn.full { width: 100%; }
+.stdBtn.primary { background: var(--accent-color); color: #fff; border: none; }
 
-.stdBtn.primary {
-  background: var(--accent-color, #a855f7);
-  border: none;
-}
-
-/* 3. EN ÜST SABİT HEADER */
 .topBanner {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 60px;
-  background: var(--bg-sidebar, #1a1a24);
-  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -61,42 +81,23 @@ body {
   z-index: 1100;
 }
 
-.bannerLeft {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
+.bannerLeft { display: flex; align-items: center; gap: 16px; }
+.brandTop { display: flex; align-items: center; gap: 10px; }
+.brandLogo { width: 34px; height: 34px; border-radius: 50%; }
+.brandTitle { margin: 0; font-size: 1.25rem; }
 
-.brandTop {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.brandLogo {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-}
-
-.brandTitle {
-  margin: 0;
-  font-size: 1.25rem;
-}
-
-/* AMBALAJ DÜZENİ */
 .appContainer {
   margin-top: 60px;
   display: flex;
   min-height: calc(100vh - 60px);
+  position: relative;
 }
 
-/* 2. SLIDE SIDEBAR */
 .sidebar {
   width: 280px;
-  background: var(--bg-sidebar, #1a1a24);
-  border-right: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  transition: transform 0.3s ease;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: fixed;
   top: 60px;
   bottom: 0;
@@ -106,29 +107,22 @@ body {
   transform: translateX(-100%);
 }
 
-.sidebar.open {
-  transform: translateX(0);
+.sidebar.open { transform: translateX(0); }
+
+.mainContent {
+  flex: 1;
+  padding: 32px;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
 }
 
-.sidebarNav {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.sidebar.open ~ .mainContent {
+  margin-left: 280px;
 }
 
-.navSection {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.sectionTitle {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.6;
-}
+.sidebarNav { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.navSection { display: flex; flex-direction: column; gap: 10px; }
+.sectionTitle { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; }
 
 .textInput {
   width: 100%;
@@ -137,23 +131,22 @@ body {
   padding: 0 14px;
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
-  color: #fff;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   outline: none;
 }
 
-.statusFilters {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.tagCloud { display: flex; flex-wrap: wrap; gap: 8px; }
+.tagItem {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
 }
-
-/* ANA İÇERİK */
-.mainContent {
-  flex: 1;
-  padding: 32px;
-  transition: margin-left 0.3s ease;
-}
+.tagItem:hover, .tagItem.active { background: var(--accent-color); color: #fff; }
 
 .poemGrid {
   display: grid;
@@ -163,14 +156,15 @@ body {
 }
 
 .poemCard {
-  background: var(--bg-card, #232330);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 20px;
   cursor: pointer;
+  transition: transform 0.2s;
 }
+.poemCard:hover { transform: translateY(-3px); }
 
-/* 3.a KEEP USULÜ FLOATING BUTTON */
 .fabBtn {
   position: fixed;
   bottom: 32px;
@@ -178,7 +172,7 @@ body {
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: var(--accent-color, #a855f7);
+  background: var(--accent-color);
   color: #fff;
   border: none;
   font-size: 1.8rem;
@@ -188,19 +182,13 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 1200;
-  transition: transform 0.2s ease;
 }
 
-.fabBtn:hover {
-  transform: scale(1.08);
-}
-
-/* MODAL POP-UP'LAR */
 .modalDialog {
   border: none;
   border-radius: 20px;
-  background: var(--bg-card, #1c1c26);
-  color: #fff;
+  background: var(--bg-card);
+  color: var(--text-primary);
   padding: 0;
   max-width: 600px;
   width: 90%;
@@ -211,53 +199,15 @@ body {
   backdrop-filter: blur(4px);
 }
 
-.modalContainer {
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+.modalContainer { padding: 28px; display: flex; flex-direction: column; gap: 20px; }
+.modalHeader { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; }
 
-.modalHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 14px;
-}
-
-.poemTitleInput {
-  width: 100%;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1.25rem;
-  outline: none;
-}
-
-.poemContentTextarea {
-  width: 100%;
-  height: 240px;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1rem;
-  line-height: 1.6;
-  resize: none;
-  outline: none;
-}
-
-.iconBtn {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.3rem;
-  cursor: pointer;
-}
-
-.themeChoices {
-  display: flex;
-  gap: 12px;
-}
-
+.poemTitleInput { width: 100%; background: transparent; border: none; color: var(--text-primary); font-size: 1.25rem; outline: none; }
+.poemContentTextarea { width: 100%; height: 240px; background: transparent; border: none; color: var(--text-primary); font-size: 1rem; line-height: 1.6; resize: none; outline: none; }
+.iconBtn { background: none; border: none; color: var(--text-primary); font-size: 1.3rem; cursor: pointer; }
+.themeChoices { display: flex; gap: 10px; flex-wrap: wrap; }
 .font-times { font-family: 'Tinos', 'Times New Roman', serif !important; }
+
+@media (max-width: 768px) {
+  .sidebar.open ~ .mainContent { margin-left: 0; }
+}

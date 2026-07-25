@@ -3,8 +3,9 @@
   const state = {
     poems: [],
     selectedStatus: 'all',
+    selectedTag: '',
     searchQuery: '',
-    poemFont: localStorage.getItem('munnesir-poem-font') || 'font-times'
+    poemFont: 'font-times'
   };
 
   const $ = (s) => document.querySelector(s);
@@ -58,7 +59,40 @@
 
   async function refresh() {
     state.poems = await getAllPoems();
+    renderTags();
     renderFeed();
+  }
+
+  function renderTags() {
+    const tagCloud = $('#tagCloud');
+    if (!tagCloud) return;
+
+    const tagsSet = new Set();
+    state.poems.forEach(p => {
+      if (p.tags && Array.isArray(p.tags)) {
+        p.tags.forEach(t => tagsSet.add(t));
+      }
+      const matches = (p.content || '').match(/#[\wığüşöçİĞÜŞÖÇ]+/g);
+      if (matches) matches.forEach(m => tagsSet.add(m.replace('#', '')));
+    });
+
+    if (!tagsSet.size) {
+      tagCloud.innerHTML = '<span style="font-size:0.8rem; opacity:0.5;">Etiket yok</span>';
+      return;
+    }
+
+    tagCloud.innerHTML = [...tagsSet].map(tag => `
+      <span class="tagItem ${state.selectedTag === tag ? 'active' : ''}" data-tag="${tag}">#${plain(tag)}</span>
+    `).join('');
+
+    $$('.tagItem').forEach(el => {
+      el.addEventListener('click', () => {
+        const tag = el.dataset.tag;
+        state.selectedTag = (state.selectedTag === tag) ? '' : tag;
+        renderTags();
+        renderFeed();
+      });
+    });
   }
 
   function renderFeed() {
@@ -73,9 +107,16 @@
       else list = list.filter(p => p.status === state.selectedStatus);
     }
 
+    if (state.selectedTag) {
+      list = list.filter(p => (p.content || '').includes(`#${state.selectedTag}`) || (p.tags && p.tags.includes(state.selectedTag)));
+    }
+
     if (state.searchQuery) {
       const q = state.searchQuery.toLowerCase('tr');
-      list = list.filter(p => p.title.toLowerCase('tr').includes(q) || p.content.toLowerCase('tr').includes(q));
+      list = list.filter(p => 
+        (p.title || '').toLowerCase('tr').includes(q) || 
+        (p.content || '').toLowerCase('tr').includes(q)
+      );
     }
 
     const statsLine = $('#statsLine');
@@ -115,107 +156,71 @@
     $('#readerDialog')?.showModal();
   }
 
-  function openEditor(id = null) {
+  function openEditor() {
     const dialog = $('#poemDialog');
-    const titleInput = $('#poemTitleInput');
-    const contentInput = $('#poemContentInput');
-
-    if (id) {
-      const poem = state.poems.find(p => p.id === id);
-      if (poem) {
-        titleInput.value = poem.title;
-        contentInput.value = poem.content;
-        dialog.dataset.editId = id;
-      }
-    } else {
-      titleInput.value = '';
-      contentInput.value = '';
-      delete dialog.dataset.editId;
-    }
-
+    $('#poemTitleInput').value = '';
+    $('#poemContentInput').value = '';
+    delete dialog.dataset.editId;
     dialog?.showModal();
   }
 
   function applyTheme(t) {
-    document.documentElement.className = `theme-${t}`;
-    localStorage.setItem('munnesir-theme', t);
+    const selected = ['light', 'purple', 'black'].includes(t) ? t : 'purple';
+    document.documentElement.className = `theme-${selected}`;
+    localStorage.setItem('munnesir-theme', selected);
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
     await openDB();
     await refresh();
 
-    // 2. HAMBURGER MENÜ TETİKLEYİCİSİ
     $('#sidebarToggle')?.addEventListener('click', () => {
       $('#sidebar')?.classList.toggle('open');
     });
 
-    // 3.a FLOATING FAB BUTTON
+    $('#searchInput')?.addEventListener('input', (e) => {
+      state.searchQuery = e.target.value.trim();
+      renderFeed();
+    });
+
     $('#newPoemFabBtn')?.addEventListener('click', () => openEditor());
     $('#closePoemBtn')?.addEventListener('click', () => $('#poemDialog')?.close());
 
-    // 5. KAYDETME MEKANİZMASI
     $('#poemForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const dialog = $('#poemDialog');
       const title = $('#poemTitleInput').value.trim();
       const content = $('#poemContentInput').value.trim();
-
       if (!content) return;
 
-      const id = dialog.dataset.editId || `poem-${Date.now()}`;
-      const existing = state.poems.find(p => p.id === id);
+      const id = `poem-${Date.now()}`;
+      const extractedTags = (content.match(/#[\wığüşöçİĞÜŞÖÇ]+/g) || []).map(t => t.replace('#', ''));
 
       const poemData = {
         id, title, content,
+        tags: extractedTags,
         updatedAt: new Date().toISOString(),
-        createdAt: existing ? existing.createdAt : new Date().toISOString(),
-        status: existing ? existing.status : 'draft',
-        favorite: existing ? existing.favorite : false
+        createdAt: new Date().toISOString(),
+        status: 'archive',
+        favorite: false
       };
 
       await savePoemToDB(poemData);
-      dialog.close();
+      $('#poemDialog')?.close();
       await refresh();
     });
 
-    // 4. KİTAP ADAYLARI POP-UP
-    $('#bookViewBtn')?.addEventListener('click', () => {
-      const books = state.poems.filter(p => p.isBookCandidate);
-      const container = $('#bookListContainer');
-      if (books.length) {
-        container.innerHTML = books.map(b => `<p>• ${plain(b.title)}</p>`).join('');
-      } else {
-        container.innerHTML = '<p>Henüz kitap adayı eklenmemiş.</p>';
-      }
-      $('#bookDialog')?.showModal();
-    });
+    $('#bookViewBtn')?.addEventListener('click', () => $('#bookDialog')?.showModal());
     $('#closeBookBtn')?.addEventListener('click', () => $('#bookDialog')?.close());
-
-    // 4. ÇÖP KUTUSU POP-UP
-    $('#trashViewBtn')?.addEventListener('click', () => {
-      const trashed = state.poems.filter(p => p.trashedAt);
-      const container = $('#trashListContainer');
-      if (trashed.length) {
-        container.innerHTML = trashed.map(t => `<p>• ${plain(t.title)}</p>`).join('');
-      } else {
-        container.innerHTML = '<p>Çöp kutusu boş.</p>';
-      }
-      $('#trashDialog')?.showModal();
-    });
+    $('#trashViewBtn')?.addEventListener('click', () => $('#trashDialog')?.showModal());
     $('#closeTrashBtn')?.addEventListener('click', () => $('#trashDialog')?.close());
-
-    // AYARLAR & OKUMA POP-UP
     $('#settingsOpenBtn')?.addEventListener('click', () => $('#settingsDialog')?.showModal());
     $('#closeSettingsBtn')?.addEventListener('click', () => $('#settingsDialog')?.close());
     $('#closeReaderBtn')?.addEventListener('click', () => $('#readerDialog')?.close());
 
-    // TEMA
     $$('.themeChoice').forEach(btn => {
       btn.addEventListener('click', () => applyTheme(btn.dataset.themeChoice));
     });
 
-    // FILTRELER
     $$('#statusFilters button').forEach(btn => {
       btn.addEventListener('click', () => {
         $$('#statusFilters button').forEach(b => b.classList.remove('active'));
@@ -227,4 +232,6 @@
 
     applyTheme(localStorage.getItem('munnesir-theme') || 'purple');
   });
+
+  window.refreshAll = refresh;
 })();
