@@ -296,37 +296,52 @@
   });
 
 
-  // SYNC.JS KÖPRÜ FONKSİYONLARI (ŞİİRİ EKRANA DÖKEN KISIM)
+// SYNC VE VERİ TABANI KÖPRÜSÜ (1276 ŞİİRİ EKRANA DÖKER)
   window.getAllPoems = getAllPoems;
   window.savePoem = savePoemToDB;
   window.refresh = refresh;
   window.refreshAll = refresh;
 
-  // Sync.js veriyi toplu indirdiğinde burayı çağırır:
+  // Sync.js veriyi indirince veritabanına toplu yazar ve ekranı günceller
   window.saveMany = async function(poems) {
-    if (!db || !Array.isArray(poems)) return;
-    const tx = db.transaction('poems', 'readwrite');
-    const store = tx.objectStore('poems');
-    poems.forEach(p => store.put(p));
+    if (!poems || !Array.isArray(poems)) return;
+    await openDB();
+    if (!db) return;
+
     return new Promise((resolve) => {
-      tx.oncomplete = () => {
-        refresh();
+      const tx = db.transaction('poems', 'readwrite');
+      const store = tx.objectStore('poems');
+      poems.forEach(p => {
+        if (p && p.id) store.put(p);
+      });
+      tx.oncomplete = async () => {
+        await refresh();
         resolve();
       };
     });
   };
 
-  // Sync.js JSON yedek veya bulut snapshot'ı indirdiğinde burayı çağırır:
+  // Sync snapshot indirdiğinde tetiklenen ana fonksiyon
   window.importJsonPayloads = async function(payloads) {
     if (!payloads || !payloads.length) return;
+    let allPoems = [];
     for (const item of payloads) {
       const raw = item.raw || item;
       const poems = raw.poems || (Array.isArray(raw) ? raw : []);
-      if (poems.length) {
-        await window.saveMany(poems);
-      }
+      if (poems.length) allPoems.push(...poems);
     }
-    await refresh();
+    if (allPoems.length) {
+      await window.saveMany(allPoems);
+    } else {
+      await refresh();
+    }
   };
+
+  // Sayfa yüklendiğinde ve sync tamamlandığında otomatik tetikleme
+  window.addEventListener('load', () => {
+    setTimeout(async () => {
+      await refresh();
+    }, 1000);
+  });
 
 })();
