@@ -381,53 +381,6 @@
     setTimeout(() => runSafely(() => syncMerge(true), true), 1600);
   }
 
-  function injectUi() {
-    const sidebar = qs('#sidebar');
-    if (!sidebar || qs('#syncOpenBtn')) return;
-    const panel = document.createElement('section');
-    panel.className = 'panel syncPanel';
-    panel.innerHTML = `
-      <h2>Bulut senkronu</h2>
-      <p id="syncStatusText" class="syncStatus" data-tone="idle">Şifreli bulut bekleniyor.</p>
-      <div class="syncPanelActions">
-        <button id="syncOpenBtn" class="ghostBtn full" type="button">Bulut girişi</button>
-        <button id="syncNowBtn" class="primaryBtn modernBtn full" type="button">Senkronize et</button>
-      </div>
-    `;
-    const importPanel = qs('.importPanel');
-    if (importPanel && importPanel.parentNode) importPanel.parentNode.insertBefore(panel, importPanel.nextSibling);
-    else sidebar.appendChild(panel);
-
-    const cfg = loadConfig();
-    const dialog = document.createElement('dialog');
-    dialog.id = 'syncDialog';
-    dialog.className = 'themeDialog syncDialog';
-    dialog.innerHTML = `
-      <form method="dialog" class="themeForm syncForm">
-        <div class="dialogHeader">
-          <h2>Bulut senkronu</h2>
-          <button class="iconBtn" type="button" id="closeSyncBtn" aria-label="Kapat">×</button>
-        </div>
-        <label class="inputLabel" for="syncBaseInput">Site adresi</label>
-        <input id="syncBaseInput" class="textInput" type="url" value="${escapeAttr(cfg.apiBase || '')}" placeholder="https://munnesir.com" />
-        <label class="inputLabel" for="syncPasswordInput">Munnesir şifresi</label>
-        <input id="syncPasswordInput" class="textInput" type="password" autocomplete="current-password" placeholder="Şifre" />
-        <label class="checkLabel syncCheck"><input id="syncAutoInput" type="checkbox" ${cfg.auto ? 'checked' : ''} /> İnternet gelince ve değişiklik olduğunda otomatik senkronize et</label>
-        <div class="syncDialogActions">
-          <button id="syncSignInBtn" class="primaryBtn modernBtn" type="button">Giriş yap</button>
-          <button id="syncSignOutBtn" class="dangerBtn compactDanger" type="button">Çıkış</button>
-        </div>
-        <div class="syncDialogActions">
-          <button id="syncMergeBtn" class="primaryBtn modernBtn" type="button">Tam senkron</button>
-          <button id="syncUploadBtn" class="ghostBtn modernBtn" type="button">Bu cihazı buluta gönder</button>
-          <button id="syncDownloadBtn" class="ghostBtn modernBtn" type="button">Bulutu bu cihaza al</button>
-        </div>
-        <p class="syncHint">E-posta yok. Kod yok. Tek şifreyle giriş yapılır; oturum bu cihazda saklanır. Eski JSON yedekleri yine Arşiv yedeği yükle ile içe alınır.</p>
-      </form>
-    `;
-    document.body.appendChild(dialog);
-  }
-
   function escapeAttr(value) {
     return String(value || '').replace(/[&<>'"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[ch]));
   }

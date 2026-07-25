@@ -220,6 +220,15 @@
       renderFeed();
     });
 
+    // DETAYLI SENKRONİZASYON POP-UP DİNLEYİCİLERİ
+    $('#openSyncAdvBtn')?.addEventListener('click', () => {
+      $('#syncAdvDialog')?.showModal();
+    });
+
+    $('#closeSyncAdvBtn')?.addEventListener('click', () => {
+      $('#syncAdvDialog')?.close();
+    });
+
     // ARKA PLANA TIKLANINCA EDİTÖRÜN KAPANMASINI ENGELLEME
     const poemDlg = $('#poemDialog');
     poemDlg?.addEventListener('click', (e) => {
