@@ -219,22 +219,24 @@
       await refresh();
     });
 
-    // KİTAP ADAYLARI DÜZELTME (Hem localStorage hem de Şiir Niteliklerini Okur)
+    
+    // KİTAP ADAYLARI
     $('#bookViewBtn')?.addEventListener('click', () => {
-      // 1. localStorage'daki kaydedilmiş kitap yapılarını oku
       const localBooks = JSON.parse(localStorage.getItem('munnesir-books') || '[]');
       const bookPoemIds = new Set();
       localBooks.forEach(b => (b.poemIds || []).forEach(id => bookPoemIds.add(id)));
 
-      // 2. Hem objesinde işaretli olanları hem de kitap listesinde geçenleri filtrele
-      const books = state.poems.filter(p => p.isBookCandidate || bookPoemIds.has(p.id));
+      const books = state.poems.filter(p => p.isBookCandidate || p.status === 'book' || bookPoemIds.has(p.id));
       const container = $('#bookListContainer');
 
       if (books.length) {
         container.innerHTML = books.map(b => `
-          <div style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
-            <span>• ${plain(b.title)}</span>
-            <span style="font-size: 0.8rem; opacity: 0.6;">${formatDate(b.updatedAt)}</span>
+          <div style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="display:block;">• ${plain(b.title)}</strong>
+              <small style="opacity:0.6;">${formatDate(b.updatedAt)}</small>
+            </div>
+            <span style="font-size: 0.8rem; color: #a855f7; background: rgba(168, 85, 247, 0.1); padding: 4px 8px; border-radius: 6px;">Kitap Adayı</span>
           </div>
         `).join('');
       } else {
@@ -242,20 +244,22 @@
       }
       $('#bookDialog')?.showModal();
     });
-    
-    $('#closeBookBtn')?.addEventListener('click', () => $('#bookDialog')?.close());
-    
-    // ÇÖP KUTUSU DÜZELTME (trashedAt VEYA status === 'trash' Olanları Okur)
-    $('#trashViewBtn')?.addEventListener('click', () => {
-      // Hem trashedAt tarihi olanları hem de status alanı 'trash' veya 'deleted' yapılmış olanları yakala
-      const trashed = state.poems.filter(p => p.trashedAt || p.status === 'trash' || p.status === 'deleted');
+
+
+    // ÇÖP KUTUSU
+    $('#trashViewBtn')?.addEventListener('click', async () => {
+      const deletedSyncIds = new Set(JSON.parse(localStorage.getItem('munnesir-sync-deleted-ids') || '[]').map(x => x.id));
+      const trashed = state.poems.filter(p => p.trashedAt || p.status === 'trash' || p.status === 'deleted' || deletedSyncIds.has(p.id));
       const container = $('#trashListContainer');
 
       if (trashed.length) {
         container.innerHTML = trashed.map(t => `
-          <div style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
-            <span>• ${plain(t.title)}</span>
-            <span style="font-size: 0.8rem; color: #ef4444;">Silindi</span>
+          <div style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="display:block;">${plain(t.title)}</strong>
+              <small style="opacity:0.6;">${formatDate(t.updatedAt || t.trashedAt)}</small>
+            </div>
+            <span style="font-size: 0.8rem; color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 4px 8px; border-radius: 6px;">Silindi</span>
           </div>
         `).join('');
       } else {
@@ -291,5 +295,9 @@
     await refresh();
   });
 
+  // SYNC.JS BAĞLANTILARI
+  window.getAllPoems = getAllPoems;
+  window.savePoem = savePoemToDB;
+  window.refresh = refresh;
   window.refreshAll = refresh;
 })();
