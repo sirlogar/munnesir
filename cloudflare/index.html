@@ -13,7 +13,7 @@
 </head>
 <body class="theme-purple">
 
-  <!-- EN ÜST SABİT HEADER -->
+  <!-- EN ÜST SABİT BANNER -->
   <header class="topBanner">
     <div class="bannerLeft">
       <button id="sidebarToggle" class="iconBtn" type="button" aria-label="Menü">☰</button>
@@ -31,17 +31,18 @@
     <!-- SOL SLIDE MENÜ -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebarNav">
-        <!-- 5. ARAMA KUTUSU -->
+        <!-- ARAMA KUTUSU -->
         <div class="navSection">
           <input type="text" id="searchInput" class="textInput" placeholder="🔍 Şiir veya etiket ara..." />
         </div>
 
-        <!-- 4. ETİKETLER KUTUSU -->
+        <!-- ETİKETLER KUTUSU -->
         <div class="navSection">
           <span class="sectionTitle">Etiketler</span>
           <div id="tagCloud" class="tagCloud"></div>
         </div>
 
+        <!-- DURUM FİLTRELERİ -->
         <div class="navSection">
           <span class="sectionTitle">Durum</span>
           <div id="statusFilters" class="statusFilters">
@@ -74,10 +75,10 @@
     </main>
   </div>
 
-  <!-- FLOATING ACTION BUTTON -->
+  <!-- GOOGLE KEEP USULÜ FLOATING (+) BUTONU -->
   <button id="newPoemFabBtn" class="fabBtn" type="button" title="Yeni Şiir Ekle">+</button>
 
-  <!-- AYARLAR & REVİZE EDİLMİŞ SENKRONİZASYON POP-UP -->
+  <!-- AYARLAR & REVİZE SENKRONİZASYON POP-UP -->
   <dialog id="settingsDialog" class="modalDialog">
     <div class="modalContainer">
       <div class="modalHeader">
@@ -85,17 +86,17 @@
         <button id="closeSettingsBtn" class="iconBtn" type="button">✕</button>
       </div>
       <div class="modalBody">
-        <!-- 2. TEMA SEÇİMİ -->
+        <!-- TEMA SEÇİMİ -->
         <div class="settingGroup">
           <h3>Tema Seçimi</h3>
           <div class="themeChoices">
-            <button class="stdBtn themeChoice" data-theme-choice="purple" type="button">Mor (Varsayılan)</button>
+            <button class="stdBtn themeChoice" data-theme-choice="purple" type="button">Mor</button>
             <button class="stdBtn themeChoice" data-theme-choice="light" type="button">Aydınlık</button>
             <button class="stdBtn themeChoice" data-theme-choice="black" type="button">Siyah</button>
           </div>
         </div>
 
-        <!-- 3. YENİDEN TASARLANAN SENKRONİZASYON BLOĞU -->
+        <!-- ELDEN GEÇİRİLMİŞ SENKRONİZASYON BLOĞU -->
         <div class="settingGroup">
           <h3>Bulut Senkronizasyonu</h3>
           <div class="syncBlock">
@@ -136,7 +137,7 @@
     </div>
   </dialog>
 
-  <!-- ŞİİR YAZMA EDITÖRÜ -->
+  <!-- ŞİİR YAZMA EDİTÖRÜ -->
   <dialog id="poemDialog" class="modalDialog">
     <form method="dialog" id="poemForm" class="modalContainer">
       <div class="modalHeader">
@@ -144,7 +145,7 @@
         <button id="closePoemBtn" class="iconBtn" type="button">✕</button>
       </div>
 
-      <textarea id="poemContentInput" class="poemContentTextarea font-times" placeholder="Mısralarınızı yazın... (Örn: #sevda etiketler kullanabilirsiniz)" required></textarea>
+      <textarea id="poemContentInput" class="poemContentTextarea font-times" placeholder="Mısralarınızı buraya yazın... (#etiket ekleyebilirsiniz)" required></textarea>
 
       <div class="modalFooter">
         <button id="savePoemBtn" class="stdBtn primary" type="submit">Kaydet</button>
@@ -164,8 +165,7 @@
     </div>
   </dialog>
 
-<!-- MODÜLER MİMARİ İÇİN KESİN ÇÖZÜM -->
-  <script type="module" src="main.js"></script>
+  <script src="app.js"></script>
   <script src="sync.js"></script>
 </body>
 </html>

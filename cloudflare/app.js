@@ -183,7 +183,6 @@
     localStorage.setItem('munnesir-theme', selected);
   }
 
-  // DINLEYICILERI ANINDA BAĞLA (HOTFIX)
   function initEvents() {
     $('#sidebarToggle')?.addEventListener('click', () => {
       $('#sidebar')?.classList.toggle('open');
@@ -245,9 +244,9 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
-    initEvents(); // Butonları anında aktif et
-    await openDB(); // Veritabanını arkada yükle
-    await refresh(); // İçeriği getir
+    initEvents();
+    await openDB();
+    await refresh();
   });
 
   window.refreshAll = refresh;
