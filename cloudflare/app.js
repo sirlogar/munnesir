@@ -177,6 +177,7 @@
     content.textContent = poem.content;
     content.className = `readerContent ${state.poemFont}`;
 
+    document.body.classList.add('modal-open'); // Arka planı dondur
     $('#readerDialog')?.showModal();
   }
 
@@ -223,6 +224,37 @@
     $('#closeSyncAdvBtn')?.addEventListener('click', () => {
       $('#syncAdvDialog')?.close();
     });
+
+
+    // ARKA PLAN DONDURMA KÖPRÜLERİ
+    const closeModal = (dialogId) => {
+      $(dialogId)?.close();
+      // Eğer ekranda başka açık modal kalmadıysa arka plan kilidini kaldır
+      if (!document.querySelector('dialog[open]')) {
+        document.body.classList.remove('modal-open');
+      }
+    };
+
+    const openModal = (dialogId) => {
+      document.body.classList.add('modal-open');
+      $(dialogId)?.showModal();
+    };
+
+    // Kapatma Butonları
+    $('#closePoemBtn')?.addEventListener('click', () => closeModal('#poemDialog'));
+    $('#closeReaderBtn')?.addEventListener('click', () => closeModal('#readerDialog'));
+    $('#closeBookBtn')?.addEventListener('click', () => closeModal('#bookDialog'));
+    $('#closeTrashBtn')?.addEventListener('click', () => closeModal('#trashDialog'));
+    $('#closeSettingsBtn')?.addEventListener('click', () => closeModal('#settingsDialog'));
+    $('#closeSyncAdvBtn')?.addEventListener('click', () => closeModal('#syncAdvDialog'));
+
+    // Açma Butonları
+    $('#newPoemFabBtn')?.addEventListener('click', () => { openEditor(); document.body.classList.add('modal-open'); });
+    $('#bookViewBtn')?.addEventListener('click', () => openModal('#bookDialog'));
+    $('#trashViewBtn')?.addEventListener('click', () => openModal('#trashDialog'));
+    $('#settingsOpenBtn')?.addEventListener('click', () => openModal('#settingsDialog'));
+    $('#openSyncAdvBtn')?.addEventListener('click', () => openModal('#syncAdvDialog'));
+
 
     // AUTOFILL (OTOMATİK DOLDURMA) ENGELLEMELİ ARAMA
     const searchEl = $('#searchInput');
@@ -353,6 +385,7 @@
     });
 
     applyTheme(localStorage.getItem('munnesir-theme') || 'purple');
+
   }
 
   document.addEventListener('DOMContentLoaded', async () => {

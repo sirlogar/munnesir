@@ -397,3 +397,11 @@ dialog#poemDialog .poemContentTextarea {
   line-height: 1.8 !important;
   font-size: 1.1rem !important;
 }
+
+
+/* POP-UP AÇIKKEN ARKA PLANI DONDURMA KİLİDİ */
+body.modal-open {
+  overflow: hidden !important;
+  height: 100vh !important;
+  touch-action: none;
+}
