@@ -221,3 +221,87 @@ body {
 @media (max-width: 768px) {
   .sidebar.open ~ .mainContent { margin-left: 0; }
 }
+
+/* HEADER FONT VE ALT YAZI STİLİ */
+.brandTextGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandTitle {
+  margin: 0;
+  font-family: 'Cinzel', 'Tinos', serif;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.brandSubtitle {
+  font-family: 'Tinos', serif;
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--subtext-color, rgba(255,255,255,0.65));
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+
+/* ORTA ALT OK DÜZENİ */
+.scrollNavContainer {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 1200;
+}
+
+.scrollNavBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color, rgba(255,255,255,0.12));
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.scrollNavBtn:hover {
+  background: var(--accent-color, #a855f7);
+  border-color: var(--accent-color, #a855f7);
+  color: #fff;
+}
+
+
+/* SENKRONİZASYON VE PANEL ESTETİK DÜZELTMESİ */
+.syncPanel, .panel, .syncDialog form {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  color: var(--text-primary) !important;
+}
+
+.syncPanel button, .syncDialog button, .syncDialogActions button {
+  height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--border-color) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-primary) !important;
+  font-size: 0.85rem !important;
+  cursor: pointer !important;
+}
+
+.syncPanel button:hover, .syncDialog button:hover {
+  background: var(--accent-color) !important;
+  color: #fff !important;
+}

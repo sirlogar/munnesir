@@ -19,7 +19,10 @@
       <button id="sidebarToggle" class="iconBtn" type="button" aria-label="Menü">☰</button>
       <div class="brandTop">
         <img src="icons/m-cir.png" alt="Munnesir Logo" class="brandLogo">
-        <h1 class="brandTitle">Munnesir</h1>
+        <div class="brandTextGroup">
+          <h1 class="brandTitle">MUNNESİR</h1>
+          <span class="brandSubtitle">hayata yeni yelkenler açmaya çalışan bir oluşum</span>
+        </div>
       </div>
     </div>
     <div class="bannerRight">
@@ -34,6 +37,16 @@
         <!-- ARAMA KUTUSU -->
         <div class="navSection">
           <input type="text" id="searchInput" class="textInput" placeholder="🔍 Şiir veya etiket ara..." />
+        </div>
+
+        <!-- SIRALAMA SEÇENEKLERİ -->
+        <div class="navSection">
+          <span class="sectionTitle">Sıralama</span>
+          <select id="sortSelect" class="textInput selectInput">
+            <option value="updatedDesc">Son Düzenlenen</option>
+            <option value="createdDesc">Yeni Eklenen</option>
+            <option value="titleAsc">A-Z (Başlığa Göre)</option>
+          </select>
         </div>
 
         <!-- ETİKETLER KUTUSU -->
@@ -73,6 +86,12 @@
         <p>Sağ alttaki + butonunu kullanarak ilk şiirini ekleyebilirsin.</p>
       </div>
     </main>
+  </div>
+
+  <!-- ORTA ALT ŞEFFAF YUKARI/AŞAĞI NAVİGASYON OKLARI -->
+  <div class="scrollNavContainer">
+    <button id="scrollTopBtn" class="scrollNavBtn" type="button" title="En Yukarı Git">↑</button>
+    <button id="scrollBottomBtn" class="scrollNavBtn" type="button" title="En Aşağı Git">↓</button>
   </div>
 
   <!-- GOOGLE KEEP USULÜ FLOATING (+) BUTONU -->

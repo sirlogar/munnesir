@@ -132,6 +132,17 @@
       );
     }
 
+    // SIRALAMA ALGORİTMASI
+    list.sort((a, b) => {
+      if (state.sortOrder === 'titleAsc') {
+        return (a.title || '').localeCompare(b.title || '', 'tr');
+      } else if (state.sortOrder === 'createdDesc') {
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      } else {
+        return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+      }
+    });
+
     const statsLine = $('#statsLine');
     if (statsLine) statsLine.textContent = `${list.length} şiir`;
 
@@ -196,6 +207,20 @@
     $('#newPoemFabBtn')?.addEventListener('click', () => openEditor());
     $('#closePoemBtn')?.addEventListener('click', () => $('#poemDialog')?.close());
 
+    $('#scrollTopBtn')?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    $('#scrollBottomBtn')?.addEventListener('click', () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
+
+    $('#sortSelect')?.addEventListener('change', (e) => {
+      state.sortOrder = e.target.value;
+      renderFeed();
+    });
+
+
     $('#poemForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const title = $('#poemTitleInput').value.trim();
@@ -217,6 +242,7 @@
       await savePoemToDB(poemData);
       $('#poemDialog')?.close();
       await refresh();
+
     });
 
 
