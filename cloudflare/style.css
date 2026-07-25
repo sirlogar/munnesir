@@ -1,3 +1,4 @@
+/* 2. TEMALAR VE RENK DEĞİŞKENLERİ */
 :root, html.theme-purple {
   --bg-primary: #121218;
   --bg-sidebar: #1a1a24;
@@ -35,6 +36,7 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
+/* 1. KUSURSUZ BUTON TİPİ */
 .stdBtn {
   height: 42px;
   padding: 0 16px;
@@ -66,6 +68,7 @@ body {
 .stdBtn.full { width: 100%; }
 .stdBtn.primary { background: var(--accent-color); color: #fff; border: none; }
 
+/* EN ÜST SABİT BANT */
 .topBanner {
   position: fixed;
   top: 0;
@@ -79,6 +82,7 @@ body {
   justify-content: space-between;
   padding: 0 20px;
   z-index: 1100;
+  transition: background 0.3s ease;
 }
 
 .bannerLeft { display: flex; align-items: center; gap: 16px; }
@@ -86,6 +90,7 @@ body {
 .brandLogo { width: 34px; height: 34px; border-radius: 50%; }
 .brandTitle { margin: 0; font-size: 1.25rem; }
 
+/* 1. SAYFA DÜZENİ VE SAYFAYI İTME MEKANİZMASI */
 .appContainer {
   margin-top: 60px;
   display: flex;
@@ -107,12 +112,15 @@ body {
   transform: translateX(-100%);
 }
 
-.sidebar.open { transform: translateX(0); }
+.sidebar.open {
+  transform: translateX(0);
+}
 
+/* SAYFA İÇERİĞİNİ SAĞA İTME */
 .mainContent {
   flex: 1;
   padding: 32px;
-  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
 }
 
@@ -123,6 +131,28 @@ body {
 .sidebarNav { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
 .navSection { display: flex; flex-direction: column; gap: 10px; }
 .sectionTitle { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; }
+
+/* 4. ETİKETLER BULUTU */
+.tagCloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tagItem {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.tagItem:hover, .tagItem.active {
+  background: var(--accent-color);
+  color: #fff;
+}
 
 .textInput {
   width: 100%;
@@ -135,18 +165,6 @@ body {
   color: var(--text-primary);
   outline: none;
 }
-
-.tagCloud { display: flex; flex-wrap: wrap; gap: 8px; }
-.tagItem {
-  font-size: 0.8rem;
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  cursor: pointer;
-}
-.tagItem:hover, .tagItem.active { background: var(--accent-color); color: #fff; }
 
 .poemGrid {
   display: grid;
@@ -161,10 +179,12 @@ body {
   border-radius: 16px;
   padding: 20px;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, background 0.3s;
 }
+
 .poemCard:hover { transform: translateY(-3px); }
 
+/* FLOATING (+) BUTONU */
 .fabBtn {
   position: fixed;
   bottom: 32px;
@@ -184,6 +204,7 @@ body {
   z-index: 1200;
 }
 
+/* POP-UP MODALLAR & 3. YENİ SENKRON ŞEKLİ */
 .modalDialog {
   border: none;
   border-radius: 20px;
@@ -202,10 +223,24 @@ body {
 .modalContainer { padding: 28px; display: flex; flex-direction: column; gap: 20px; }
 .modalHeader { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; }
 
+.settingGroup { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.themeChoices { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* 3. SENKRONİZASYON ALANI STİLİ */
+.syncBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.syncActions {
+  display: flex;
+  gap: 10px;
+}
+
 .poemTitleInput { width: 100%; background: transparent; border: none; color: var(--text-primary); font-size: 1.25rem; outline: none; }
 .poemContentTextarea { width: 100%; height: 240px; background: transparent; border: none; color: var(--text-primary); font-size: 1rem; line-height: 1.6; resize: none; outline: none; }
 .iconBtn { background: none; border: none; color: var(--text-primary); font-size: 1.3rem; cursor: pointer; }
-.themeChoices { display: flex; gap: 10px; flex-wrap: wrap; }
 .font-times { font-family: 'Tinos', 'Times New Roman', serif !important; }
 
 @media (max-width: 768px) {

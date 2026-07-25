@@ -13,7 +13,7 @@
 </head>
 <body class="theme-purple">
 
-  <!-- EN ÜST SABİT BANT (Logo & Munnesir Yazısı) -->
+  <!-- EN ÜST SABİT HEADER -->
   <header class="topBanner">
     <div class="bannerLeft">
       <button id="sidebarToggle" class="iconBtn" type="button" aria-label="Menü">☰</button>
@@ -27,14 +27,16 @@
     </div>
   </header>
 
-  <div class="appContainer">
+  <div class="appContainer" id="appContainer">
     <!-- SOL SLIDE MENÜ -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebarNav">
+        <!-- 5. ARAMA KUTUSU -->
         <div class="navSection">
           <input type="text" id="searchInput" class="textInput" placeholder="🔍 Şiir veya etiket ara..." />
         </div>
 
+        <!-- 4. ETİKETLER KUTUSU -->
         <div class="navSection">
           <span class="sectionTitle">Etiketler</span>
           <div id="tagCloud" class="tagCloud"></div>
@@ -58,7 +60,7 @@
       </div>
     </aside>
 
-    <!-- ANA İÇERİK -->
+    <!-- ANA İÇERİK (SAYFA İTİLME ALANI) -->
     <main class="mainContent" id="mainContent">
       <div class="contentHeader">
         <span id="statsLine">0 şiir</span>
@@ -72,10 +74,10 @@
     </main>
   </div>
 
-  <!-- GOOGLE KEEP USULÜ SAĞ ALTTEKİ + BUTONU -->
+  <!-- FLOATING ACTION BUTTON -->
   <button id="newPoemFabBtn" class="fabBtn" type="button" title="Yeni Şiir Ekle">+</button>
 
-  <!-- AYARLAR POP-UP -->
+  <!-- AYARLAR & REVİZE EDİLMİŞ SENKRONİZASYON POP-UP -->
   <dialog id="settingsDialog" class="modalDialog">
     <div class="modalContainer">
       <div class="modalHeader">
@@ -83,11 +85,26 @@
         <button id="closeSettingsBtn" class="iconBtn" type="button">✕</button>
       </div>
       <div class="modalBody">
-        <h3>Tema Seçimi</h3>
-        <div class="themeChoices">
-          <button class="stdBtn themeChoice" data-theme-choice="purple" type="button">Mor</button>
-          <button class="stdBtn themeChoice" data-theme-choice="light" type="button">Aydınlık</button>
-          <button class="stdBtn themeChoice" data-theme-choice="black" type="button">Siyah</button>
+        <!-- 2. TEMA SEÇİMİ -->
+        <div class="settingGroup">
+          <h3>Tema Seçimi</h3>
+          <div class="themeChoices">
+            <button class="stdBtn themeChoice" data-theme-choice="purple" type="button">Mor (Varsayılan)</button>
+            <button class="stdBtn themeChoice" data-theme-choice="light" type="button">Aydınlık</button>
+            <button class="stdBtn themeChoice" data-theme-choice="black" type="button">Siyah</button>
+          </div>
+        </div>
+
+        <!-- 3. YENİDEN TASARLANAN SENKRONİZASYON BLOĞU -->
+        <div class="settingGroup">
+          <h3>Bulut Senkronizasyonu</h3>
+          <div class="syncBlock">
+            <input type="password" id="syncPasswordInput" placeholder="Munnesir Şifresi" class="textInput" />
+            <div class="syncActions">
+              <button id="syncSignInBtn" class="stdBtn primary" type="button">Giriş Yap</button>
+              <button id="syncNowBtn" class="stdBtn" type="button">Şimdi Senkronize Et</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -119,7 +136,7 @@
     </div>
   </dialog>
 
-  <!-- ŞİİR YAZMA EDİTÖRÜ -->
+  <!-- ŞİİR YAZMA EDITÖRÜ -->
   <dialog id="poemDialog" class="modalDialog">
     <form method="dialog" id="poemForm" class="modalContainer">
       <div class="modalHeader">
@@ -127,7 +144,7 @@
         <button id="closePoemBtn" class="iconBtn" type="button">✕</button>
       </div>
 
-      <textarea id="poemContentInput" class="poemContentTextarea font-times" placeholder="Mısralarınızı buraya yazın..." required></textarea>
+      <textarea id="poemContentInput" class="poemContentTextarea font-times" placeholder="Mısralarınızı yazın... (Örn: #sevda etiketler kullanabilirsiniz)" required></textarea>
 
       <div class="modalFooter">
         <button id="savePoemBtn" class="stdBtn primary" type="submit">Kaydet</button>
@@ -147,7 +164,8 @@
     </div>
   </dialog>
 
-  <script src="app.js"></script>
+<!-- MODÜLER MİMARİ İÇİN KESİN ÇÖZÜM -->
+  <script type="module" src="main.js"></script>
   <script src="sync.js"></script>
 </body>
 </html>

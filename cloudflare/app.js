@@ -5,7 +5,7 @@
     selectedStatus: 'all',
     selectedTag: '',
     searchQuery: '',
-    poemFont: 'font-times'
+    poemFont: localStorage.getItem('munnesir-poem-font') || 'font-times'
   };
 
   const $ = (s) => document.querySelector(s);
@@ -63,6 +63,7 @@
     renderFeed();
   }
 
+  // 4. ETİKETLERİ DİNAMİK ÇIKARMA VE BASTIRMA
   function renderTags() {
     const tagCloud = $('#tagCloud');
     if (!tagCloud) return;
@@ -72,6 +73,7 @@
       if (p.tags && Array.isArray(p.tags)) {
         p.tags.forEach(t => tagsSet.add(t));
       }
+      // Metin içinde geçen #etiket taraması
       const matches = (p.content || '').match(/#[\wığüşöçİĞÜŞÖÇ]+/g);
       if (matches) matches.forEach(m => tagsSet.add(m.replace('#', '')));
     });
@@ -95,6 +97,7 @@
     });
   }
 
+  // 5. ARAMA VE FİLTRELEME MOTORU
   function renderFeed() {
     const grid = $('#poemGrid');
     const emptyState = $('#emptyState');
@@ -111,6 +114,7 @@
       list = list.filter(p => (p.content || '').includes(`#${state.selectedTag}`) || (p.tags && p.tags.includes(state.selectedTag)));
     }
 
+    // ARAMA SÜZGECİ
     if (state.searchQuery) {
       const q = state.searchQuery.toLowerCase('tr');
       list = list.filter(p => 
@@ -156,59 +160,82 @@
     $('#readerDialog')?.showModal();
   }
 
-  function openEditor() {
+  function openEditor(id = null) {
     const dialog = $('#poemDialog');
-    $('#poemTitleInput').value = '';
-    $('#poemContentInput').value = '';
-    delete dialog.dataset.editId;
+    const titleInput = $('#poemTitleInput');
+    const contentInput = $('#poemContentInput');
+
+    if (id) {
+      const poem = state.poems.find(p => p.id === id);
+      if (poem) {
+        titleInput.value = poem.title;
+        contentInput.value = poem.content;
+        dialog.dataset.editId = id;
+      }
+    } else {
+      titleInput.value = '';
+      contentInput.value = '';
+      delete dialog.dataset.editId;
+    }
+
     dialog?.showModal();
   }
 
+  // 2. TEMA DEĞİŞTİRME MOTORU
   function applyTheme(t) {
-    const selected = ['light', 'purple', 'black'].includes(t) ? t : 'purple';
-    document.documentElement.className = `theme-${selected}`;
-    localStorage.setItem('munnesir-theme', selected);
+    document.documentElement.className = `theme-${t}`;
+    localStorage.setItem('munnesir-theme', t);
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
     await openDB();
     await refresh();
 
+    // 1. HAMBURGER MENÜ TETİKLEYİCİSİ
     $('#sidebarToggle')?.addEventListener('click', () => {
       $('#sidebar')?.classList.toggle('open');
     });
 
+    // 5. ANLIK CANLI ARAMA
     $('#searchInput')?.addEventListener('input', (e) => {
       state.searchQuery = e.target.value.trim();
       renderFeed();
     });
 
+    // FLOATING FAB BUTTON
     $('#newPoemFabBtn')?.addEventListener('click', () => openEditor());
     $('#closePoemBtn')?.addEventListener('click', () => $('#poemDialog')?.close());
 
+    // ŞİİR KAYDETME
     $('#poemForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const dialog = $('#poemDialog');
       const title = $('#poemTitleInput').value.trim();
       const content = $('#poemContentInput').value.trim();
+
       if (!content) return;
 
-      const id = `poem-${Date.now()}`;
+      const id = dialog.dataset.editId || `poem-${Date.now()}`;
+      const existing = state.poems.find(p => p.id === id);
+
+      // Metinden Etiket Çıkarma
       const extractedTags = (content.match(/#[\wığüşöçİĞÜŞÖÇ]+/g) || []).map(t => t.replace('#', ''));
 
       const poemData = {
         id, title, content,
         tags: extractedTags,
         updatedAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        status: 'archive',
-        favorite: false
+        createdAt: existing ? existing.createdAt : new Date().toISOString(),
+        status: existing ? existing.status : 'draft',
+        favorite: existing ? existing.favorite : false
       };
 
       await savePoemToDB(poemData);
-      $('#poemDialog')?.close();
+      dialog.close();
       await refresh();
     });
 
+    // POP-UP TIKLAMALARI
     $('#bookViewBtn')?.addEventListener('click', () => $('#bookDialog')?.showModal());
     $('#closeBookBtn')?.addEventListener('click', () => $('#bookDialog')?.close());
     $('#trashViewBtn')?.addEventListener('click', () => $('#trashDialog')?.showModal());
@@ -217,10 +244,12 @@
     $('#closeSettingsBtn')?.addEventListener('click', () => $('#settingsDialog')?.close());
     $('#closeReaderBtn')?.addEventListener('click', () => $('#readerDialog')?.close());
 
+    // 2. TEMA SEÇİM DİNLEYİCİSİ
     $$('.themeChoice').forEach(btn => {
       btn.addEventListener('click', () => applyTheme(btn.dataset.themeChoice));
     });
 
+    // DURUM FİLTRELERİ
     $$('#statusFilters button').forEach(btn => {
       btn.addEventListener('click', () => {
         $$('#statusFilters button').forEach(b => b.classList.remove('active'));
@@ -232,6 +261,4 @@
 
     applyTheme(localStorage.getItem('munnesir-theme') || 'purple');
   });
-
-  window.refreshAll = refresh;
 })();
