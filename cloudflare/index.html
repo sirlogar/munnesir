@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Munnesir v1.0</title>
+  <title>Munnesir</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -13,62 +13,52 @@
 </head>
 <body>
 
-  <!-- ORİJİNAL SOL MENÜ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="brandHeader">
+  <!-- 3. EN ÜST SABİT HEADER (Logo ve Başlık Hamburger Menüden Ayrı En Üstte) -->
+  <header class="topBanner">
+    <div class="bannerLeft">
+      <button id="sidebarToggle" class="iconBtn" type="button" aria-label="Menü">☰</button>
       <div class="brandTop">
         <img src="icons/m-cir.png" alt="Munnesir Logo" class="brandLogo">
         <h1 class="brandTitle">Munnesir</h1>
       </div>
-      <p class="brandSubtitle">hayata yeni yelkenler açmaya çalışan bir oluşum</p>
     </div>
+    <div class="bannerRight">
+      <button id="settingsOpenBtn" class="iconBtn" type="button" title="Ayarlar">⚙</button>
+    </div>
+  </header>
 
-    <div class="sidebarNav">
-      <div class="navSection">
-        <input type="text" id="searchInput" class="searchInput" placeholder="🔍 Şiir veya etiket ara..." />
-      </div>
+  <div class="appContainer">
+    <!-- SOL SLIDE MENÜ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebarNav">
+        <div class="navSection">
+          <input type="text" id="searchInput" class="textInput" placeholder="🔍 Şiir veya etiket ara..." />
+        </div>
 
-      <div class="navSection">
-        <span class="sectionTitle">Etiketler</span>
-        <div id="tagCloud" class="tagCloud"></div>
-      </div>
+        <div class="navSection">
+          <span class="sectionTitle">Etiketler</span>
+          <div id="tagCloud" class="tagCloud"></div>
+        </div>
 
-      <div class="navSection">
-        <span class="sectionTitle">Durum</span>
-        <div id="statusFilters" class="statusFilters">
-          <button class="navBtn active" data-status="all" type="button">Tümü</button>
-          <button class="navBtn" data-status="draft" type="button">Taslak</button>
-          <button class="navBtn" data-status="ready" type="button">Yayına hazır</button>
-          <button class="navBtn" data-status="archive" type="button">Arşiv</button>
-          <button class="navBtn" data-status="favorite" type="button">★ Seçmeler</button>
+        <div class="navSection">
+          <span class="sectionTitle">Durum</span>
+          <div id="statusFilters" class="statusFilters">
+            <button class="stdBtn active" data-status="all" type="button">Tümü</button>
+            <button class="stdBtn" data-status="draft" type="button">Taslak</button>
+            <button class="stdBtn" data-status="ready" type="button">Yayına hazır</button>
+            <button class="stdBtn" data-status="archive" type="button">Arşiv</button>
+            <button class="stdBtn" data-status="favorite" type="button">★ Seçmeler</button>
+          </div>
+        </div>
+
+        <div class="navSection">
+          <button id="bookViewBtn" class="stdBtn full" type="button">📚 Kitap adayları</button>
+          <button id="trashViewBtn" class="stdBtn full" type="button">🗑 Çöp kutusu</button>
         </div>
       </div>
+    </aside>
 
-      <div class="navSection">
-        <button id="bookViewBtn" class="navBtn full" type="button">📚 Kitap adayları</button>
-        <div class="activeBooksContainer" id="activeBooksContainer"></div>
-      </div>
-
-      <div class="navSection">
-        <button id="trashViewBtn" class="navBtn full" type="button">🗑 Çöp kutusu</button>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ANA İÇERİK ALANI -->
-  <div class="appLayout">
-    <header class="topBanner">
-      <div class="bannerLeft">
-        <button id="sidebarToggle" class="iconBtn mobileOnly" type="button">☰</button>
-      </div>
-
-      <button id="newPoemBtn" class="primaryBtn" type="button">+ Yeni Şiir</button>
-
-      <div class="bannerRight">
-        <button id="settingsOpenBtn" class="iconBtn" type="button" title="Ayarlar">⚙</button>
-      </div>
-    </header>
-
+    <!-- ANA İÇERİK -->
     <main class="mainContent">
       <div class="contentHeader">
         <span id="statsLine">0 şiir</span>
@@ -77,10 +67,13 @@
       <section id="poemGrid" class="poemGrid"></section>
       <div id="emptyState" class="emptyState" hidden>
         <h2>Arşiv boş.</h2>
-        <p>Henüz kayıtlı bir şiir bulunmuyor.</p>
+        <p>Sağ alttaki + butonunu kullanarak ilk şiirini ekleyebilirsin.</p>
       </div>
     </main>
   </div>
+
+  <!-- 3.a GOOGLE KEEP USULÜ FLOATING (+ / YENİ ŞİİR) BUTONU -->
+  <button id="newPoemFabBtn" class="fabBtn" type="button" title="Yeni Şiir Ekle">+</button>
 
   <!-- AYARLAR POP-UP -->
   <dialog id="settingsDialog" class="modalDialog">
@@ -89,30 +82,39 @@
         <h2>Ayarlar</h2>
         <button id="closeSettingsBtn" class="iconBtn" type="button">✕</button>
       </div>
-
-      <div class="settingsTabsList">
-        <button class="settingTabBtn active" data-tab="tab-theme" type="button">Tema</button>
-        <button class="settingTabBtn" data-tab="tab-font" type="button">Font</button>
+      <div class="modalBody">
+        <h3>Tema Seçimi</h3>
+        <div class="themeChoices">
+          <button class="stdBtn themeChoice" data-theme-choice="purple" type="button">Mor</button>
+          <button class="stdBtn themeChoice" data-theme-choice="light" type="button">Aydınlık</button>
+          <button class="stdBtn themeChoice" data-theme-choice="black" type="button">Siyah</button>
+        </div>
       </div>
+    </div>
+  </dialog>
 
-      <div class="settingsTabContent">
-        <div class="tabSubPage active" id="tab-theme">
-          <h3>Tema Seçimi</h3>
-          <div class="themeChoices">
-            <button class="themeChoice" data-theme-choice="purple" type="button">Mor</button>
-            <button class="themeChoice" data-theme-choice="light" type="button">Aydınlık</button>
-            <button class="themeChoice" data-theme-choice="black" type="button">Siyah</button>
-          </div>
-        </div>
+  <!-- 4. KİTAP ADAYLARI POP-UP -->
+  <dialog id="bookDialog" class="modalDialog">
+    <div class="modalContainer">
+      <div class="modalHeader">
+        <h2>📚 Kitap Adayları</h2>
+        <button id="closeBookBtn" class="iconBtn" type="button">✕</button>
+      </div>
+      <div class="modalBody" id="bookListContainer">
+        <p>Henüz kitap adayı olarak işaretlenmiş bir çalışma yok.</p>
+      </div>
+    </div>
+  </dialog>
 
-        <div class="tabSubPage" id="tab-font">
-          <h3>Şiir Yazı Fontu</h3>
-          <select id="globalFontSelect" class="selectInput">
-            <option value="font-times">Times New Roman</option>
-            <option value="font-roboto">Roboto</option>
-            <option value="font-google-sans">Google Sans</option>
-          </select>
-        </div>
+  <!-- 4. ÇÖP KUTUSU POP-UP -->
+  <dialog id="trashDialog" class="modalDialog">
+    <div class="modalContainer">
+      <div class="modalHeader">
+        <h2>🗑 Çöp Kutusu</h2>
+        <button id="closeTrashBtn" class="iconBtn" type="button">✕</button>
+      </div>
+      <div class="modalBody" id="trashListContainer">
+        <p>Çöp kutusu boş.</p>
       </div>
     </div>
   </dialog>
@@ -121,25 +123,20 @@
   <dialog id="poemDialog" class="modalDialog">
     <form method="dialog" id="poemForm" class="modalContainer">
       <div class="modalHeader">
-        <input id="poemTitleInput" class="poemTitleInput" type="text" placeholder="Şiir başlığı..." />
+        <input id="poemTitleInput" class="poemTitleInput" type="text" placeholder="Şiir başlığı..." required />
         <button id="closePoemBtn" class="iconBtn" type="button">✕</button>
       </div>
 
-      <textarea id="poemContentInput" class="poemContentTextarea font-times" placeholder="Mısralarınızı buraya yazın..."></textarea>
+      <textarea id="poemContentInput" class="poemContentTextarea font-times" placeholder="Mısralarınızı buraya yazın..." required></textarea>
 
       <div class="modalFooter">
-        <select id="editorFontSelect" class="selectInput fontSelectSm">
-          <option value="font-times">Times New Roman</option>
-          <option value="font-roboto">Roboto</option>
-          <option value="font-google-sans">Google Sans</option>
-        </select>
-        <button id="savePoemBtn" class="primaryBtn" type="submit">Kaydet</button>
+        <button id="savePoemBtn" class="stdBtn primary" type="submit">Kaydet</button>
       </div>
     </form>
   </dialog>
 
   <!-- ŞİİR OKUMA PENCERESİ -->
-  <dialog id="readerDialog" class="modalDialog readerModal">
+  <dialog id="readerDialog" class="modalDialog">
     <div class="modalContainer">
       <div class="modalHeader">
         <h2 id="readerTitle"></h2>

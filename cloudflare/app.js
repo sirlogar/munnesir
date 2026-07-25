@@ -34,7 +34,7 @@
     });
   }
 
-  function savePoem(poem) {
+  function savePoemToDB(poem) {
     return new Promise((resolve) => {
       if (!db) return resolve();
       const tx = db.transaction('poems', 'readwrite');
@@ -91,13 +91,9 @@
 
     grid.innerHTML = list.map((p) => `
       <article class="poemCard" data-id="${p.id}">
-        <div class="cardTitleRow">
-          <h3>${p.favorite ? '★ ' : ''}${plain(p.title)}</h3>
-        </div>
-        <p class="${state.poemFont}">${plain(p.content).slice(0, 200)}...</p>
-        <div class="cardMeta">
-          <span>${formatDate(p.updatedAt)}</span>
-        </div>
+        <h3>${p.favorite ? '★ ' : ''}${plain(p.title)}</h3>
+        <p class="${state.poemFont}">${plain(p.content).slice(0, 150)}...</p>
+        <span style="font-size:0.8rem; opacity:0.6;">${formatDate(p.updatedAt)}</span>
       </article>
     `).join('');
 
@@ -137,16 +133,7 @@
       delete dialog.dataset.editId;
     }
 
-    contentInput.className = `poemContentTextarea ${state.poemFont}`;
-    $('#editorFontSelect').value = state.poemFont;
-
     dialog?.showModal();
-  }
-
-  function updateFont(fClass) {
-    state.poemFont = fClass;
-    localStorage.setItem('munnesir-poem-font', fClass);
-    renderFeed();
   }
 
   function applyTheme(t) {
@@ -158,21 +145,20 @@
     await openDB();
     await refresh();
 
-    // Arama Kutusu
-    $('#searchInput')?.addEventListener('input', (e) => {
-      state.searchQuery = e.target.value.trim();
-      renderFeed();
+    // 2. HAMBURGER MENÜ TETİKLEYİCİSİ
+    $('#sidebarToggle')?.addEventListener('click', () => {
+      $('#sidebar')?.classList.toggle('open');
     });
 
-    // Yeni Şiir Butonu
-    $('#newPoemBtn')?.addEventListener('click', () => openEditor());
+    // 3.a FLOATING FAB BUTTON
+    $('#newPoemFabBtn')?.addEventListener('click', () => openEditor());
     $('#closePoemBtn')?.addEventListener('click', () => $('#poemDialog')?.close());
 
-    // Form Kaydet
+    // 5. KAYDETME MEKANİZMASI
     $('#poemForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const dialog = $('#poemDialog');
-      const title = $('#poemTitleInput').value.trim() || 'Başlıksız Şiir';
+      const title = $('#poemTitleInput').value.trim();
       const content = $('#poemContentInput').value.trim();
 
       if (!content) return;
@@ -185,41 +171,51 @@
         updatedAt: new Date().toISOString(),
         createdAt: existing ? existing.createdAt : new Date().toISOString(),
         status: existing ? existing.status : 'draft',
-        favorite: existing ? existing.favorite : false,
-        tags: existing ? existing.tags : []
+        favorite: existing ? existing.favorite : false
       };
 
-      await savePoem(poemData);
+      await savePoemToDB(poemData);
       dialog.close();
       await refresh();
     });
 
-    // Reader Kapat
-    $('#closeReaderBtn')?.addEventListener('click', () => $('#readerDialog')?.close());
+    // 4. KİTAP ADAYLARI POP-UP
+    $('#bookViewBtn')?.addEventListener('click', () => {
+      const books = state.poems.filter(p => p.isBookCandidate);
+      const container = $('#bookListContainer');
+      if (books.length) {
+        container.innerHTML = books.map(b => `<p>• ${plain(b.title)}</p>`).join('');
+      } else {
+        container.innerHTML = '<p>Henüz kitap adayı eklenmemiş.</p>';
+      }
+      $('#bookDialog')?.showModal();
+    });
+    $('#closeBookBtn')?.addEventListener('click', () => $('#bookDialog')?.close());
 
-    // Ayarlar Pop-up
+    // 4. ÇÖP KUTUSU POP-UP
+    $('#trashViewBtn')?.addEventListener('click', () => {
+      const trashed = state.poems.filter(p => p.trashedAt);
+      const container = $('#trashListContainer');
+      if (trashed.length) {
+        container.innerHTML = trashed.map(t => `<p>• ${plain(t.title)}</p>`).join('');
+      } else {
+        container.innerHTML = '<p>Çöp kutusu boş.</p>';
+      }
+      $('#trashDialog')?.showModal();
+    });
+    $('#closeTrashBtn')?.addEventListener('click', () => $('#trashDialog')?.close());
+
+    // AYARLAR & OKUMA POP-UP
     $('#settingsOpenBtn')?.addEventListener('click', () => $('#settingsDialog')?.showModal());
     $('#closeSettingsBtn')?.addEventListener('click', () => $('#settingsDialog')?.close());
+    $('#closeReaderBtn')?.addEventListener('click', () => $('#readerDialog')?.close());
 
-    $$('.settingTabBtn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        $$('.settingTabBtn').forEach(b => b.classList.remove('active'));
-        $$('.tabSubPage').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        $(`#${btn.dataset.tab}`)?.classList.add('active');
-      });
-    });
-
-    // Font Değişimi
-    $('#editorFontSelect')?.addEventListener('change', (e) => updateFont(e.target.value));
-    $('#globalFontSelect')?.addEventListener('change', (e) => updateFont(e.target.value));
-
-    // Tema Değişimi
+    // TEMA
     $$('.themeChoice').forEach(btn => {
       btn.addEventListener('click', () => applyTheme(btn.dataset.themeChoice));
     });
 
-    // Durum Filtreleri
+    // FILTRELER
     $$('#statusFilters button').forEach(btn => {
       btn.addEventListener('click', () => {
         $$('#statusFilters button').forEach(b => b.classList.remove('active'));
@@ -229,13 +225,6 @@
       });
     });
 
-    // Mobil Menü
-    $('#sidebarToggle')?.addEventListener('click', () => {
-      $('#sidebar')?.classList.toggle('open');
-    });
-
     applyTheme(localStorage.getItem('munnesir-theme') || 'purple');
   });
-
-  window.refreshAll = refresh;
 })();
