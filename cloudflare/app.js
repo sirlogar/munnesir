@@ -220,6 +220,20 @@
       renderFeed();
     });
 
+    // ARKA PLANA TIKLANINCA EDİTÖRÜN KAPANMASINI ENGELLEME
+    const poemDlg = $('#poemDialog');
+    poemDlg?.addEventListener('click', (e) => {
+      const rect = poemDlg.getBoundingClientRect();
+      if (
+        e.clientX < rect.left ||
+        e.clientX > rect.right ||
+        e.clientY < rect.top ||
+        e.clientY > rect.bottom
+      ) {
+        e.preventDefault(); // Dışarı tıklansa bile kapanmaz
+      }
+    });
+
 
     $('#poemForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
