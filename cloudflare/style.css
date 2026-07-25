@@ -14,6 +14,7 @@ html.theme-light {
   --text-primary: #1e1e2d;
   --border-color: rgba(0, 0, 0, 0.1);
   --accent-color: #7c3aed;
+  --subtext-color: rgba(30, 30, 45, 0.65);
 }
 
 html.theme-black {
