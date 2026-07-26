@@ -273,10 +273,6 @@
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     });
 
-    $('#sortSelect')?.addEventListener('change', (e) => {
-      state.sortOrder = e.target.value;
-      renderFeed();
-    });
 
     // DETAYLI SENKRONİZASYON POP-UP DİNLEYİCİLERİ
     $('#openSyncAdvBtn')?.addEventListener('click', () => {
@@ -756,13 +752,43 @@
           updatedCount++;
         }
       }
-
       state.selectedTag = newTag;
       await refresh();
-
       if (advStatus) {
         advStatus.textContent = `✓ '${oldTag}' etiketi '${newTag}' olarak değiştirildi (${updatedCount} şiir güncellendi).`;
       }
+    });
+
+
+    // ÖZEL SIRALAMA DROPDOWN DİNLEYİCİSİ
+    const customDropdown = $('#sortCustomDropdown');
+    const dropdownBtn = $('#sortDropdownBtn');
+    const dropdownLabel = $('#sortDropdownLabel');
+    const dropdownOptions = $$('#sortDropdownMenu .dropdownOption');
+
+    dropdownBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      customDropdown?.classList.toggle('open');
+    });
+
+    dropdownOptions.forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownOptions.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+
+        const val = opt.dataset.value;
+        if (dropdownLabel) dropdownLabel.textContent = opt.textContent;
+        state.sortOrder = val;
+        
+        customDropdown?.classList.remove('open');
+        renderFeed();
+      });
+    });
+
+    // Sayfa dışına tıklandığında dropdown'ı kapat
+    document.addEventListener('click', () => {
+      customDropdown?.classList.remove('open');
     });
 
 
