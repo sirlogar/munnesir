@@ -580,3 +580,39 @@ dialog#poemDialog .poemContentTextarea {
   color: #ffffff !important;
   font-weight: 600;
 }
+
+
+/* 1. TÜM UYGULAMADA VE HAMBURGER MENÜDE YAZI SEÇİMİNİ KAPAT */
+*, *::before, *::after, .sidebar, .sidebarNav, .navSection {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+/* 2. YALNIZCA ŞİİRLER, BAŞLIKLAR VE GİRDİ ALANLARI (ETİKET DÜZENLEME DAHİL) SEÇİLEBİLİR */
+.poemCard, 
+.poemCard h3, 
+.poemCard p,
+#readerTitle,
+#readerContent,
+.poemTitleInput, 
+.poemContentTextarea,
+#searchInput,
+#editTagInput,
+textarea, 
+input[type="text"], 
+input[type="password"], 
+input[type="search"] {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* 3. İKON VE BUTON SÜRÜKLENMELERİNİ ENGELLE */
+img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+}
