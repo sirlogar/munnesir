@@ -157,7 +157,6 @@
             <div style="display: flex; gap: 10px;">
               <button id="exportJsonBtn" class="stdBtn full" type="button">📥 JSON İndir (Yedek Al)</button>
               <button id="importJsonBtn" class="stdBtn full" type="button">📤 JSON Yükle (Keep/Arşiv)</button>
-              <input type="file" id="jsonFileInput" accept=".json" style="display: none;" />
             </div>
           </div>
           
@@ -243,6 +242,10 @@
     </div>
   </dialog>
 
+  <!-- GİZLİ DOSYA SEÇİCİ (DIALOG DIŞINDA) -->
+  <input type="file" id="jsonFileInput" accept=".json,application/json" style="display: none !important;" />
+
+  <script src="cordova.js"></script>
   <script src="app.js"></script>
   <script src="sync.js"></script>
 </body>

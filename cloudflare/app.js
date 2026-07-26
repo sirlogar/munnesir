@@ -94,35 +94,27 @@
   }
 
   function renderTags() {
-    const tagCloud = $('#tagCloud');
-    if (!tagCloud) return;
-
-    const tagsSet = new Set();
+    const container = $('#tagCloud');
+    if (!container) return;
+    
+    const tagSet = new Set();
     state.poems.forEach(p => {
-      if (p.tags && Array.isArray(p.tags)) {
-        p.tags.forEach(t => tagsSet.add(t));
+      if (Array.isArray(p.tags)) {
+        p.tags.forEach(t => {
+          if (t && t !== '(boş)') tagSet.add(t.trim());
+        });
       }
-      const matches = (p.content || '').match(/#[\wığüşöçİĞÜŞÖÇ]+/g);
-      if (matches) matches.forEach(m => tagsSet.add(m.replace('#', '')));
     });
 
-    if (!tagsSet.size) {
-      tagCloud.innerHTML = '<span style="font-size:0.8rem; opacity:0.5;">Etiket yok</span>';
-      return;
-    }
-
-    tagCloud.innerHTML = [...tagsSet].map(tag => `
-      <span class="tagItem ${state.selectedTag === tag ? 'active' : ''}" data-tag="${tag}">#${plain(tag)}</span>
-    `).join('');
-
-    $$('.tagItem').forEach(el => {
-      el.addEventListener('click', () => {
-        const tag = el.dataset.tag;
-        state.selectedTag = (state.selectedTag === tag) ? '' : tag;
-        renderTags();
-        renderFeed();
-      });
+    const sortedTags = Array.from(tagSet).sort((a, b) => a.localeCompare(b, 'tr'));
+    
+    let html = `<button class="tagChip ${!state.selectedTag ? 'active' : ''}" data-tag="">#(tümü)</button>`;
+    sortedTags.forEach(tag => {
+      const active = state.selectedTag === tag ? 'active' : '';
+      html += `<button class="tagChip ${active}" data-tag="${tag}">#${tag}</button>`;
     });
+
+    container.innerHTML = html;
   }
 
   function renderFeed() {
@@ -525,7 +517,7 @@
     });
 
 
-    // JSON DIŞA AKTAR (YEDEK AL)
+// JSON DIŞA AKTAR (YEDEK AL)
     $('#exportJsonBtn')?.addEventListener('click', async () => {
       const all = await getAllPoems();
       const advStatus = $('#syncAdvStatusText');
@@ -544,17 +536,31 @@
     });
 
     // JSON İÇE AKTAR (KEEP / ARŞİV YÜKLE)
-    const jsonInput = $('#jsonFileInput');
+    const jsonInput = document.getElementById('jsonFileInput');
+    
     $('#importJsonBtn')?.addEventListener('click', () => {
-      jsonInput?.click();
+      if (jsonInput) {
+        jsonInput.value = ''; // Aynı dosya tekrar seçilebilsin diye temizle
+        jsonInput.click();
+      }
+    });
+
+// ANDROID & WEB UYUMLU GELİŞMİŞ JSON IMPORT PARSER
+    const jsonInput = document.getElementById('jsonFileInput');
+    
+    $('#importJsonBtn')?.addEventListener('click', () => {
+      if (jsonInput) {
+        jsonInput.value = '';
+        jsonInput.click();
+      }
     });
 
     jsonInput?.addEventListener('change', async (e) => {
       const file = e.target.files[0];
-      const advStatus = $('#syncAdvStatusText');
+      const advStatus = document.getElementById('syncAdvStatusText');
       if (!file) return;
 
-      if (advStatus) advStatus.textContent = '⏳ JSON dosyası okunuyor...';
+      if (advStatus) advStatus.textContent = '⏳ JSON okunuyor ve veritabanı hazırlanıyor...';
 
       const reader = new FileReader();
       reader.onload = async (event) => {
@@ -562,40 +568,87 @@
           const parsed = JSON.parse(event.target.result);
           let rawPoems = [];
 
-          // Hem Google Keep hem Munnesir JSON formatlarını otomatik algıla
-          if (Array.isArray(parsed)) {
+          // 1. FORMAT TESPİTİ (Munnesir v1.0, Keep Export, Dizi)
+          if (parsed && Array.isArray(parsed.poems)) {
+            rawPoems = parsed.poems; // Tam senin paylaştığın Munnesir yapısı
+          } else if (Array.isArray(parsed)) {
             rawPoems = parsed;
-          } else if (parsed.poems && Array.isArray(parsed.poems)) {
-            rawPoems = parsed.poems;
-          } else if (parsed.title || parsed.textContent) {
-            // Tekli Keep notu
+          } else if (typeof parsed === 'object') {
             rawPoems = [parsed];
           }
 
-          // Google Keep objelerini Munnesir formatına dönüştür
-          const formattedPoems = rawPoems.map(item => ({
-            id: item.id || `poem_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-            title: item.title || item.userTitle || 'Başlıksız Şiir',
-            content: item.content || item.textContent || item.text || '',
-            status: item.status || 'ready',
-            tags: item.tags || [],
-            createdAt: item.createdAt || item.userCreatedTimestampUsec ? new Date(item.userCreatedTimestampUsec / 1000).toISOString() : new Date().toISOString(),
-            updatedAt: item.updatedAt || new Date().toISOString()
-          })).filter(p => p.content.trim() !== '');
-
-          if (formattedPoems.length > 0) {
-            await window.saveMany(formattedPoems);
-            await refresh();
-            if (advStatus) advStatus.textContent = `✓ Başarılı! ${formattedPoems.length} şiir sisteme yüklendi.`;
-          } else {
-            if (advStatus) advStatus.textContent = '⚠️ Geçerli şiir içeriği bulunamadı.';
+          if (!rawPoems.length) {
+            if (advStatus) advStatus.textContent = '⚠️ Geçerli şiir verisi bulunamadı.';
+            return;
           }
+
+          // 2. VERİ RESTORASYONU VE ETİKET DÜZENLEME
+          const formattedPoems = rawPoems.map((item, idx) => {
+            // Etiket Temizliği: "(boş)" olanları ele, metin içindeki #etiket'leri de tara
+            let tags = Array.isArray(item.tags) ? item.tags.filter(t => t && t !== '(boş)') : [];
+            
+            const contentText = item.content || item.textContent || item.text || '';
+            const titleText = item.title || item.userTitle || 'Başlıksız Şiir';
+
+            // İçerikten dinamik #etiket çıkarma
+            const bodyTags = contentText.match(/#([\wğüşıöçGÜŞİÖÇ-]+)/g);
+            if (bodyTags) {
+              bodyTags.forEach(bt => {
+                const cleanTag = bt.replace('#', '').trim();
+                if (cleanTag && !tags.includes(cleanTag)) tags.push(cleanTag);
+              });
+            }
+
+            return {
+              id: item.id || `poem_${Date.now()}_${idx}`,
+              title: titleText,
+              content: contentText,
+              status: item.status || 'ready',
+              favorite: Boolean(item.favorite),
+              source: item.source || 'manual',
+              tags: tags.length ? tags : ['(boş)'],
+              createdAt: item.createdAt || new Date().toISOString(),
+              updatedAt: item.updatedAt || new Date().toISOString()
+            };
+          }).filter(p => p.content && p.content.trim() !== '');
+
+          // 3. ANDROID WEBVIEW INDEXEDDB YAZMA KİLİDİ
+          await openDB();
+          if (!db) {
+            if (advStatus) advStatus.textContent = '❌ Veritabanı bağlantısı kurulamadı.';
+            return;
+          }
+
+          const tx = db.transaction('poems', 'readwrite');
+          const store = tx.objectStore('poems');
+
+          formattedPoems.forEach(p => store.put(p));
+
+          tx.oncomplete = async () => {
+            // Bellek Durumunu Güncelle ve Ekranı Yenile
+            await refresh();
+            const allInDb = await getAllPoems();
+            
+            if (advStatus) {
+              advStatus.textContent = `✓ Başarılı! ${formattedPoems.length} şiir yüklendi (Toplam: ${allInDb.length}).`;
+            }
+
+            // Etiket Bulutunu Tekrar Çiz
+            if (typeof renderTags === 'function') renderTags();
+          };
+
+          tx.onerror = (err) => {
+            console.error('DB Write Error:', err);
+            if (advStatus) advStatus.textContent = '❌ Veritabanına yazılırken hata oluştu.';
+          };
+
         } catch (err) {
-          console.error(err);
-          if (advStatus) advStatus.textContent = '❌ Geçersiz JSON dosyası.';
+          console.error('JSON Parsing Error:', err);
+          if (advStatus) advStatus.textContent = '❌ Dosya okunamadı. Geçersiz JSON formatı.';
         }
       };
-      reader.readAsText(file);
+
+      reader.readAsText(file, 'UTF-8');
     });
 
 
