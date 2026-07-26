@@ -404,7 +404,7 @@
     applyTheme(localStorage.getItem('munnesir-theme') || 'purple');
 
 
-    // GİRİŞ YAP VE SENKRONİZE ET BUTON TETİKLEYİCİSİ
+    // GİRİŞ YAP VE SENKRONİZE ET (GÜVENLİ VE GERÇEK SAYI OKUYAN DÜZELTME)
     $('#syncSignInBtn')?.addEventListener('click', async () => {
       const passInput = $('#syncPasswordInput');
       const statusEl = $('#syncStatusText');
@@ -418,27 +418,33 @@
       if (statusEl) statusEl.textContent = '⏳ Senkronize ediliyor...';
 
       try {
-        // sync.js üzerindeki şifre kaydetme ve senkronize etme metodu
+        // Şifreyi kaydet
         if (window.Sync && typeof window.Sync.setAuth === 'function') {
           await window.Sync.setAuth(password);
         } else if (localStorage) {
           localStorage.setItem('munnesir_sync_pass', password);
         }
 
+        // Senkronizasyonu çalıştır
         if (window.Sync && typeof window.Sync.runSync === 'function') {
-          const res = await window.Sync.runSync();
-          const count = state.poems ? state.poems.length : 0;
-          if (statusEl) statusEl.textContent = `✓ Senkronizasyon tamam: ${count} şiir senkronize edildi.`;
-        } else {
-          // Doğrudan importPayloads tetikleme
-          await refresh();
-          const count = state.poems ? state.poems.length : 0;
-          if (statusEl) statusEl.textContent = `✓ ${count} şiir senkronize edildi.`;
+          await window.Sync.runSync();
+        }
+
+        // Veritabanını tazeleyip gerçek şiir sayısını oku
+        await refresh();
+        const all = await getAllPoems();
+        const count = all ? all.length : 0;
+
+        if (statusEl) {
+          statusEl.textContent = `✓ Senkronizasyon tamam: ${count} şiir senkronize edildi.`;
         }
       } catch (err) {
+        console.error(err);
         if (statusEl) statusEl.textContent = '❌ Senkronizasyon sırasında hata oluştu.';
       }
     });
+
+
 
   }//****** initEvents sonu ******
 
