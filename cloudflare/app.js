@@ -11,6 +11,20 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
 
+
+// APK İLE AYNI CANLI SUNUCU ADRESİNİ YAKALAYAN KÖPRÜ
+  function getApiUrl(endpoint) {
+    // Eğer sync.js içinde tanımlı bir baseUrl varsa onu kullan, yoksa yerel origin'e git
+    const baseUrl = (window.Sync && window.Sync.baseUrl) 
+      ? window.Sync.baseUrl 
+      : (window.location.origin.includes('localhost') || window.location.protocol === 'file:')
+        ? 'https://munnesir.pages.dev' // <--- APK'nın bağlandığı kendi Cloudflare Pages / Worker alan adın
+        : '';
+    return `${baseUrl}${endpoint}`;
+  }
+
+
+
   function openDB() {
     return new Promise((resolve) => {
       try {
@@ -428,8 +442,9 @@
           localStorage.setItem('munnesir_sync_pass', password);
         }
 
-        // 2. Doğrudan Gerçek Snapshot API'sinden (/api/snapshot) Verileri Çek
-        const snapshotRes = await fetch('/api/snapshot', {
+
+        // Doğrudan Canlı Cloudflare API'sine İstek At
+        const snapshotRes = await fetch(getApiUrl('/api/snapshot'), {
           headers: { 'X-Munnesir-Auth': password }
         });
 
@@ -529,7 +544,7 @@
           if (advStatus) advStatus.textContent = '⏳ Bulut snapshot verileri indiriliyor...';
           try {
             const pass = $('#syncPasswordInput')?.value.trim() || localStorage.getItem('munnesir_sync_pass') || '';
-            const res = await fetch('/api/snapshot', {
+            const res = await fetch(getApiUrl('/api/snapshot'), {
               headers: { 'X-Munnesir-Auth': pass }
             });
             
