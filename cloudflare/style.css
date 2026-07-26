@@ -448,14 +448,23 @@ html.theme-light #syncStatusText {
 }
 
 
-/* POP-UP'LARIN EKRANI KİLİTLEMESİNİ ENGELLEYEN VE HİZALAYAN NET KURAL */
+/* POP-UP STANDARTLARINI DÜZELTME VE MERKEZLEME */
 dialog.modalDialog {
+  border: none !important;
+  border-radius: 20px !important;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  padding: 0 !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+}
+
+dialog.modalDialog:not([open]) {
   display: none !important;
   pointer-events: none !important;
 }
 
 dialog.modalDialog[open] {
-  display: flex !important;
+  display: block !important;
   pointer-events: auto !important;
   position: fixed !important;
   top: 50% !important;
@@ -463,4 +472,27 @@ dialog.modalDialog[open] {
   transform: translate(-50%, -50%) !important;
   margin: 0 !important;
   z-index: 2000 !important;
+  width: 90% !important;
+  max-width: 580px !important;
+  max-height: 85vh !important;
+  overflow-y: auto !important;
+}
+
+/* ŞİİR EDİTÖRÜ ÖZEL BOYUT */
+dialog#poemDialog[open] {
+  max-width: 720px !important;
+  width: 90% !important;
+}
+
+dialog#poemDialog .poemContentTextarea {
+  width: 100% !important;
+  min-height: 300px !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-primary) !important;
+  font-size: 1.1rem !important;
+  line-height: 1.6 !important;
+  resize: vertical !important;
+  outline: none !important;
+  box-sizing: border-box !important;
 }

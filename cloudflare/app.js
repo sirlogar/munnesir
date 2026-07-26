@@ -481,40 +481,42 @@
       );
     });
 
-    // BULUTU BU CİHAZA AL (ONAYLI & 0 ŞİİR FİXİ)
+    // BULUTTAN ZORLA İNDİR (ŞİİRLERİ KESİN ÇEKER)
     $('#syncDownloadBtn')?.addEventListener('click', () => {
       showConfirm(
         'Buluttan İndirilsin mi?',
         'Buluttaki tüm şiirleriniz bu cihaza indirilecek ve yerel arşiviniz güncellenecektir. Emin misiniz?',
         async () => {
           const advStatus = $('#syncAdvStatusText');
-          if (advStatus) advStatus.textContent = '⏳ Buluttaki veriler indiriliyor...';
+          if (advStatus) advStatus.textContent = '⏳ Buluttaki veriler çekiliyor...';
           try {
             const pass = $('#syncPasswordInput')?.value.trim() || localStorage.getItem('munnesir_sync_pass') || '';
-            
-            // Doğrudan API Fetch İsteği
             const res = await fetch('/api/sync', {
               headers: { 'X-Munnesir-Auth': pass }
             });
             
-            if (!res.ok) throw new Error('Auth error');
+            if (!res.ok) throw new Error('Yetkilendirme hatası');
             const data = await res.json();
 
-            if (data && data.poems && Array.isArray(data.poems)) {
-              await window.saveMany(data.poems);
+            let fetchedPoems = [];
+            if (Array.isArray(data)) fetchedPoems = data;
+            else if (data && Array.isArray(data.poems)) fetchedPoems = data.poems;
+
+            if (fetchedPoems.length > 0) {
+              await window.saveMany(fetchedPoems);
               await refresh();
-              if (advStatus) advStatus.textContent = `✓ Bulut verileri alındı: ${data.poems.length} şiir yüklendi.`;
+              if (advStatus) advStatus.textContent = `✓ Başarılı! Buluttan ${fetchedPoems.length} şiir çekildi.`;
             } else {
               if (advStatus) advStatus.textContent = '⚠️ Bulutta henüz kaydedilmiş şiir bulunamadı.';
             }
           } catch (e) {
             console.error(e);
-            if (advStatus) advStatus.textContent = '❌ Buluttan indirme başarısız. Şifrenizi kontrol edin.';
+            if (advStatus) advStatus.textContent = '❌ Buluttan indirme başarısız. Şifreyi kontrol edin.';
           }
         }
       );
     });
-
+    
 
     // JSON DIŞA AKTAR (YEDEK AL)
     $('#exportJsonBtn')?.addEventListener('click', async () => {
@@ -641,11 +643,6 @@
 
   }//****** initEvents sonu ******
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    initEvents();
-    await openDB();
-    await refresh();
-  });
 
 
 // SYNC VE VERİ TABANI KÖPRÜSÜ (1276 ŞİİRİ EKRANA DÖKER)
@@ -689,14 +686,19 @@
     }
   };
 
-// DOM YÜKLENME VE BAŞLATMA
+
+  // TEMİZ DOM BAŞLATICI
   document.addEventListener('DOMContentLoaded', async () => {
-    initEvents();
     await openDB();
+    initEvents();
     await refresh();
     if (window.Sync && typeof window.Sync.init === 'function') {
       window.Sync.init();
     }
   });
+
+})();
+
+
 
 })();
