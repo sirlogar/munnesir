@@ -115,60 +115,63 @@
           </div>
         </div>
 
-        <!-- TEK ŞIK SENKRONİZASYON BLOĞU -->
+        <!-- AYARLAR SENKRONİZASYON BLOĞU -->
         <div class="settingGroup">
           <h3>Bulut Senkronizasyonu</h3>
           <div class="syncBlock">
-
-            <!-- AYARLAR SENKRONİZASYON BLOĞU -->
-            <div class="settingGroup">
-              <h3>Bulut Senkronizasyonu</h3>
-              <div class="syncBlock">
-                <label class="inputLabel">Munnesir Şifresi</label>
-                <input type="text" name="username" value="munnesir_user" autocomplete="username" style="display:none !important;" tabindex="-1" />
-                <input type="password" id="syncPasswordInput" autocomplete="current-password" placeholder="Şifrenizi girin..." class="textInput" />
-                
-                <div class="syncActions" style="margin-top: 10px;">
-                  <button id="syncSignInBtn" class="stdBtn primary full" type="button">Giriş Yap ve Senkronize Et</button>
-                </div>
-
-                <!-- CANLI ESTETİK SENKRONİZASYON DURUM YAZISI -->
-                <div id="syncStatusText" style="margin-top: 12px; font-size: 0.85rem; text-align: center; opacity: 0.85; font-style: italic; min-height: 20px;"></div>
-
-                <button id="openSyncAdvBtn" class="stdBtn full" style="margin-top: 8px; background: rgba(255,255,255,0.03);" type="button">⚙ Senkronizasyon Ayarları</button>
-              </div>
+            <label class="inputLabel">Munnesir Şifresi</label>
+            <input type="text" name="username" value="munnesir_user" autocomplete="username" style="display:none !important;" tabindex="-1" />
+            <input type="password" id="syncPasswordInput" autocomplete="current-password" placeholder="Şifrenizi girin..." class="textInput" />
+            
+            <div class="syncActions" style="margin-top: 10px;">
+              <button id="syncSignInBtn" class="stdBtn primary full" type="button">Giriş Yap ve Senkronize Et</button>
             </div>
+
+            <!-- CANLI ESTETİK SENKRONİZASYON DURUM YAZISI -->
+            <div id="syncStatusText" style="margin-top: 12px; font-size: 0.85rem; text-align: center; opacity: 0.85; font-style: italic; min-height: 20px;"></div>
+
+            <button id="openSyncAdvBtn" class="stdBtn full" style="margin-top: 8px; background: rgba(255,255,255,0.03);" type="button">⚙ Senkronizasyon Ayarları</button>
           </div>
         </div>
       </div>
     </div>
   </dialog>
 
-<!-- DETAYLI SENKRONİZASYON AYARLARI POP-UP -->
-  <dialog id="syncAdvDialog" class="modalDialog">
-    <div class="modalContainer">
-      <div class="modalHeader">
-        <h2>Senkronizasyon Ayarları</h2>
-        <button id="closeSyncAdvBtn" class="iconBtn" type="button">✕</button>
-      </div>
-      <div class="modalBody">
-        <div class="settingGroup">
-          <label class="checkLabel" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
-            <input id="syncAutoInput" type="checkbox" checked /> İnternet gelince otomatik senkronize et
-          </label>
+  <!-- DETAYLI SENKRONİZASYON AYARLARI POP-UP -->
+    <dialog id="syncAdvDialog" class="modalDialog">
+      <div class="modalContainer">
+        <div class="modalHeader">
+          <h2>Senkronizasyon Ayarları</h2>
+          <button id="closeSyncAdvBtn" class="iconBtn" type="button">✕</button>
         </div>
-        
-        <div class="settingGroup" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-          <button id="syncUploadBtn" class="stdBtn full" type="button">Bu cihazı buluta gönder</button>
-          <button id="syncDownloadBtn" class="stdBtn full" type="button">Bulutu bu cihaza al</button>
-          <button id="syncSignOutBtn" class="stdBtn full" style="border-color: #ef4444; color: #ef4444;" type="button">Oturumu Kapat</button>
-        </div>
+        <div class="modalBody">
+          <div class="settingGroup">
+            <label class="checkLabel" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
+              <input id="syncAutoInput" type="checkbox" checked /> İnternet gelince otomatik senkronize et
+            </label>
+          </div>
 
-        <!-- BİLDİRİM METNİ -->
-        <div id="syncAdvStatusText" style="margin-top: 12px; font-size: 0.85rem; text-align: center; opacity: 0.85; font-style: italic; min-height: 20px;"></div>
+          <!-- YEDEKLEME & JSON İÇE/DIŞA AKTARMA -->
+          <div class="settingGroup" style="margin-top: 15px;">
+            <h3 style="font-size: 0.9rem; margin-bottom: 8px; opacity: 0.8;">JSON Arşiv / Keep Yedeği</h3>
+            <div style="display: flex; gap: 10px;">
+              <button id="exportJsonBtn" class="stdBtn full" type="button">📥 JSON İndir (Yedek Al)</button>
+              <button id="importJsonBtn" class="stdBtn full" type="button">📤 JSON Yükle (Keep/Arşiv)</button>
+              <input type="file" id="jsonFileInput" accept=".json" style="display: none;" />
+            </div>
+          </div>
+          
+          <div class="settingGroup" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+            <button id="syncUploadBtn" class="stdBtn full" type="button">Bu cihazı buluta gönder</button>
+            <button id="syncDownloadBtn" class="stdBtn full" type="button">Bulutu bu cihaza al</button>
+            <button id="syncSignOutBtn" class="stdBtn full" style="border-color: #ef4444; color: #ef4444;" type="button">Oturumu Kapat</button>
+          </div>
+
+          <!-- BİLDİRİM METNİ -->
+          <div id="syncAdvStatusText" style="margin-top: 12px; font-size: 0.85rem; text-align: center; opacity: 0.85; font-style: italic; min-height: 20px;"></div>
+        </div>
       </div>
-    </div>
-  </dialog>
+    </dialog>
 
   <!-- ONAY POP-UP (EMİN MİSİNİZ?) -->
   <dialog id="confirmDialog" class="modalDialog">

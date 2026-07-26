@@ -525,6 +525,80 @@
     });
 
 
+    // JSON DIŞA AKTAR (YEDEK AL)
+    $('#exportJsonBtn')?.addEventListener('click', async () => {
+      const all = await getAllPoems();
+      const advStatus = $('#syncAdvStatusText');
+      if (!all || all.length === 0) {
+        if (advStatus) advStatus.textContent = '⚠️ İndirilecek şiir bulunamadı.';
+        return;
+      }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ poems: all }, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `munnesir_arsiv_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      if (advStatus) advStatus.textContent = `✓ ${all.length} şiir JSON olarak indirildi.`;
+    });
+
+    // JSON İÇE AKTAR (KEEP / ARŞİV YÜKLE)
+    const jsonInput = $('#jsonFileInput');
+    $('#importJsonBtn')?.addEventListener('click', () => {
+      jsonInput?.click();
+    });
+
+    jsonInput?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      const advStatus = $('#syncAdvStatusText');
+      if (!file) return;
+
+      if (advStatus) advStatus.textContent = '⏳ JSON dosyası okunuyor...';
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          let rawPoems = [];
+
+          // Hem Google Keep hem Munnesir JSON formatlarını otomatik algıla
+          if (Array.isArray(parsed)) {
+            rawPoems = parsed;
+          } else if (parsed.poems && Array.isArray(parsed.poems)) {
+            rawPoems = parsed.poems;
+          } else if (parsed.title || parsed.textContent) {
+            // Tekli Keep notu
+            rawPoems = [parsed];
+          }
+
+          // Google Keep objelerini Munnesir formatına dönüştür
+          const formattedPoems = rawPoems.map(item => ({
+            id: item.id || `poem_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+            title: item.title || item.userTitle || 'Başlıksız Şiir',
+            content: item.content || item.textContent || item.text || '',
+            status: item.status || 'ready',
+            tags: item.tags || [],
+            createdAt: item.createdAt || item.userCreatedTimestampUsec ? new Date(item.userCreatedTimestampUsec / 1000).toISOString() : new Date().toISOString(),
+            updatedAt: item.updatedAt || new Date().toISOString()
+          })).filter(p => p.content.trim() !== '');
+
+          if (formattedPoems.length > 0) {
+            await window.saveMany(formattedPoems);
+            await refresh();
+            if (advStatus) advStatus.textContent = `✓ Başarılı! ${formattedPoems.length} şiir sisteme yüklendi.`;
+          } else {
+            if (advStatus) advStatus.textContent = '⚠️ Geçerli şiir içeriği bulunamadı.';
+          }
+        } catch (err) {
+          console.error(err);
+          if (advStatus) advStatus.textContent = '❌ Geçersiz JSON dosyası.';
+        }
+      };
+      reader.readAsText(file);
+    });
+
+
 
   }//****** initEvents sonu ******
 
