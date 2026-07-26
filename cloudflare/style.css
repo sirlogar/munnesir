@@ -435,3 +435,16 @@ html.theme-light select.selectInput option {
   background-color: #ffffff !important;
   color: #1e1e2d !important;
 }
+
+
+/* SENKRONİZASYON CANLI DURUM METNİ STİLİ */
+#syncStatusText {
+  color: var(--accent-color, #a855f7);
+  transition: all 0.3s ease;
+}
+
+html.theme-light #syncStatusText {
+  color: #7c3aed;
+}
+
+
