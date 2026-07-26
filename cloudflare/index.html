@@ -144,7 +144,7 @@
     </div>
   </dialog>
 
-  <!-- DETAYLI SENKRONİZASYON AYARLARI POP-UP (AYNI ÇERÇEVE VE BOYUTTA) -->
+<!-- DETAYLI SENKRONİZASYON AYARLARI POP-UP -->
   <dialog id="syncAdvDialog" class="modalDialog">
     <div class="modalContainer">
       <div class="modalHeader">
@@ -157,10 +157,30 @@
             <input id="syncAutoInput" type="checkbox" checked /> İnternet gelince otomatik senkronize et
           </label>
         </div>
+        
         <div class="settingGroup" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
           <button id="syncUploadBtn" class="stdBtn full" type="button">Bu cihazı buluta gönder</button>
           <button id="syncDownloadBtn" class="stdBtn full" type="button">Bulutu bu cihaza al</button>
           <button id="syncSignOutBtn" class="stdBtn full" style="border-color: #ef4444; color: #ef4444;" type="button">Oturumu Kapat</button>
+        </div>
+
+        <!-- BİLDİRİM METNİ -->
+        <div id="syncAdvStatusText" style="margin-top: 12px; font-size: 0.85rem; text-align: center; opacity: 0.85; font-style: italic; min-height: 20px;"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ONAY POP-UP (EMİN MİSİNİZ?) -->
+  <dialog id="confirmDialog" class="modalDialog">
+    <div class="modalContainer" style="text-align: center;">
+      <div class="modalHeader" style="justify-content: center;">
+        <h2 id="confirmTitle">Emin misiniz?</h2>
+      </div>
+      <div class="modalBody">
+        <p id="confirmMessage" style="font-size: 0.95rem; opacity: 0.9; margin: 15px 0;"></p>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+          <button id="confirmYesBtn" class="stdBtn primary" type="button" style="min-width: 100px;">Evet</button>
+          <button id="confirmNoBtn" class="stdBtn" type="button" style="min-width: 100px;">Vazgeç</button>
         </div>
       </div>
     </div>

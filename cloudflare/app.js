@@ -445,6 +445,86 @@
     });
 
 
+    // ONAY POP-UP MEKANİZMASI
+    let pendingAction = null;
+
+    const showConfirm = (title, message, action) => {
+      $('#confirmTitle').textContent = title;
+      $('#confirmMessage').textContent = message;
+      pendingAction = action;
+      document.body.classList.add('modal-open');
+      $('#confirmDialog')?.showModal();
+    };
+
+    $('#confirmNoBtn')?.addEventListener('click', () => {
+      pendingAction = null;
+      $('#confirmDialog')?.close();
+      if (!document.querySelector('dialog[open]')) document.body.classList.remove('modal-open');
+    });
+
+    $('#confirmYesBtn')?.addEventListener('click', async () => {
+      $('#confirmDialog')?.close();
+      if (pendingAction) {
+        await pendingAction();
+        pendingAction = null;
+      }
+    });
+
+    // BU CİHAZI BULUTA GÖNDER (ONAYLI)
+    $('#syncUploadBtn')?.addEventListener('click', () => {
+      showConfirm(
+        'Buluta Gönderilsin mi?',
+        'Yereldeki tüm şiirleriniz bulut veritabanına aktarılacak ve buluttaki eski verilerin üzerine yazılacaktır. Emin misiniz?',
+        async () => {
+          const advStatus = $('#syncAdvStatusText');
+          if (advStatus) advStatus.textContent = '⏳ Cihaz verileri buluta aktarılıyor...';
+          try {
+            if (window.Sync && typeof window.Sync.pushLocalToCloud === 'function') {
+              await window.Sync.pushLocalToCloud();
+            }
+            if (advStatus) advStatus.textContent = '✓ Cihaz verileri başarıyla buluta gönderildi.';
+          } catch (e) {
+            if (advStatus) advStatus.textContent = '❌ Buluta aktarım sırasında hata oluştu.';
+          }
+        }
+      );
+    });
+
+    // BULUTU BU CİHAZA AL (ONAYLI & 0 ŞİİR FİXİ)
+    $('#syncDownloadBtn')?.addEventListener('click', () => {
+      showConfirm(
+        'Buluttan İndirilsin mi?',
+        'Buluttaki tüm şiirleriniz bu cihaza indirilecek ve yerel arşiviniz güncellenecektir. Emin misiniz?',
+        async () => {
+          const advStatus = $('#syncAdvStatusText');
+          if (advStatus) advStatus.textContent = '⏳ Buluttaki veriler indiriliyor...';
+          try {
+            const pass = $('#syncPasswordInput')?.value.trim() || localStorage.getItem('munnesir_sync_pass') || '';
+            
+            // Doğrudan API Fetch İsteği
+            const res = await fetch('/api/sync', {
+              headers: { 'X-Munnesir-Auth': pass }
+            });
+            
+            if (!res.ok) throw new Error('Auth error');
+            const data = await res.json();
+
+            if (data && data.poems && Array.isArray(data.poems)) {
+              await window.saveMany(data.poems);
+              await refresh();
+              if (advStatus) advStatus.textContent = `✓ Bulut verileri alındı: ${data.poems.length} şiir yüklendi.`;
+            } else {
+              if (advStatus) advStatus.textContent = '⚠️ Bulutta henüz kaydedilmiş şiir bulunamadı.';
+            }
+          } catch (e) {
+            console.error(e);
+            if (advStatus) advStatus.textContent = '❌ Buluttan indirme başarısız. Şifrenizi kontrol edin.';
+          }
+        }
+      );
+    });
+
+
 
   }//****** initEvents sonu ******
 
