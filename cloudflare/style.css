@@ -448,3 +448,13 @@ html.theme-light #syncStatusText {
 }
 
 
+/* KAPALI DIALOG'LARIN EKRANI KİLİTLEMESİNİ ENGELLEYEN KURAL */
+dialog.modalDialog:not([open]) {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+dialog.modalDialog[open] {
+  display: flex !important;
+  pointer-events: auto !important;
+}

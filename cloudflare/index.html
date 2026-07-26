@@ -242,11 +242,17 @@
     </div>
   </dialog>
 
-  <!-- GİZLİ DOSYA SEÇİCİ (DIALOG DIŞINDA) -->
+<!-- GİZLİ DOSYA SEÇİCİ (DIALOG DIŞINDA) -->
   <input type="file" id="jsonFileInput" accept=".json,application/json" style="display: none !important;" />
 
-  <script src="cordova.js"></script>
-  <script src="app.js"></script>
-  <script src="sync.js"></script>
+  <!-- SCRIPT'LERİN GÜVENLİ VE SIRALI YÜKLENMESİ -->
+  <script>
+    // Cordova sadece mobil ortamdaysa yüklensin, webde JS zincirini tıkamasın
+    if (window.cordova || window.Capacitor) {
+      document.write('<script src="cordova.js"><\/script>');
+    }
+  </script>
+  <script src="app.js" defer></script>
+  <script src="sync.js" defer></script>
 </body>
 </html>
