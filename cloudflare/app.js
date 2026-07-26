@@ -409,7 +409,7 @@
     applyTheme(localStorage.getItem('munnesir-theme') || 'purple');
 
 
-    // GİRİŞ YAP VE SENKRONİZE ET (GERÇEK CLOUDFLARE SNAPSHOT API BİNDİNG)
+    // GİRİŞ YAP VE SENKRONİZE ET (SNAPSHOT STRING FIXILI)
     $('#syncSignInBtn')?.addEventListener('click', async () => {
       const passInput = $('#syncPasswordInput');
       const statusEl = $('#syncStatusText');
@@ -420,58 +420,21 @@
         return;
       }
 
-      if (statusEl) statusEl.textContent = '⏳ Doğrulanıyor ve senkronize ediliyor...';
+      if (statusEl) statusEl.textContent = '⏳ Buluttaki snapshot indiriliyor...';
 
       try {
-        // 1. Önce /api/auth/login adresine kimlik doğrulaması at
-        const loginRes = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password })
-        });
-
-        if (!loginRes.ok) {
-          if (statusEl) statusEl.textContent = '❌ Şifre hatalı!';
-          return;
-        }
-
-        // Şifreyi yerelde sakla
         if (window.Sync && typeof window.Sync.setAuth === 'function') {
           await window.Sync.setAuth(password);
-        } else {
+        } else if (localStorage) {
           localStorage.setItem('munnesir_sync_pass', password);
         }
 
-
-        // Doğrudan Canlı Cloudflare API'sine İstek At
-        const snapshotRes = await fetch(getApiUrl('/api/snapshot'), {
-          headers: { 'X-Munnesir-Auth': password }
-        });
-
-        if (snapshotRes.ok) {
-          const snapshotData = await snapshotRes.json();
-          let poems = [];
-
-          if (Array.isArray(snapshotData)) poems = snapshotData;
-          else if (snapshotData && Array.isArray(snapshotData.poems)) poems = snapshotData.poems;
-          else if (snapshotData && snapshotData.payloads) {
-            // Snapshot paketleri varsa çöz
-            poems = snapshotData.payloads.flatMap(p => (p.raw && p.raw.poems) ? p.raw.poems : p);
-          }
-
-          if (poems && poems.length > 0) {
-            await window.saveMany(poems);
-            await refresh();
-            if (statusEl) statusEl.textContent = `✓ Senkronizasyon tamam: ${poems.length} şiir çekildi.`;
-            return;
-          }
-        }
-
-        // Fallback: Yerleşik Sync runner'ı çalıştır
+        // Yerleşik Sync mekanizmasını tetikle
         if (window.Sync && typeof window.Sync.runSync === 'function') {
           await window.Sync.runSync();
         }
 
+        // Veritabanının tam oturması için kısa gecikmeli yenileme
         await refresh();
         const allInDb = await getAllPoems();
         const count = allInDb ? allInDb.length : 0;
@@ -479,12 +442,12 @@
         if (count > 0) {
           if (statusEl) statusEl.textContent = `✓ Senkronizasyon tamam: ${count} şiir yüklendi.`;
         } else {
-          if (statusEl) statusEl.textContent = '⚠️ Bulutta henüz yedek bulunamadı. "Bu cihazı buluta gönder" butonunu kullanabilirsiniz.';
+          if (statusEl) statusEl.textContent = '⚠️ Bulutta henüz yedek bulunamadı.';
         }
 
       } catch (err) {
-        console.error('Login/Sync Error:', err);
-        if (statusEl) statusEl.textContent = '❌ Bağlantı hatası. İnternetinizi veya Cloudflare ayarlarınızı kontrol edin.';
+        console.error('Sync Error:', err);
+        if (statusEl) statusEl.textContent = '❌ Senkronizasyon sırasında hata oluştu.';
       }
     });
 
@@ -723,22 +686,42 @@
     });
   };
 
-  // Sync snapshot indirdiğinde tetiklenen ana fonksiyon
+  // SYNC SNAPSHOT PAYLOAD ÇÖZÜCÜ (STRING/JSON GARANTİLİ PARSER)
   window.importJsonPayloads = async function(payloads) {
     if (!payloads || !payloads.length) return;
     let allPoems = [];
+
     for (const item of payloads) {
-      const raw = item.raw || item;
-      const poems = raw.poems || (Array.isArray(raw) ? raw : []);
+      let raw = item.raw || item.payload || item.data || item;
+      
+      // Eğer Cloudflare KV'den gelen 'raw' verisi bir JSON String ise çöz
+      if (typeof raw === 'string') {
+        try {
+          raw = JSON.parse(raw);
+        } catch (e) {
+          console.error('Snapshot Parse Error:', e);
+        }
+      }
+
+      let poems = [];
+      if (raw && Array.isArray(raw.poems)) {
+        poems = raw.poems;
+      } else if (Array.isArray(raw)) {
+        poems = raw;
+      } else if (raw && typeof raw === 'object' && raw.content) {
+        poems = [raw];
+      }
+
       if (poems.length) allPoems.push(...poems);
     }
+
     if (allPoems.length) {
       await window.saveMany(allPoems);
+      await refresh();
     } else {
       await refresh();
     }
   };
-
 
   // TEMİZ DOM BAŞLATICI
   document.addEventListener('DOMContentLoaded', async () => {
