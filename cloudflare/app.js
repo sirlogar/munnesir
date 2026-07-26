@@ -516,7 +516,7 @@
     });
 
 
-// JSON DIŞA AKTAR (YEDEK AL)
+    // JSON DIŞA AKTAR (YEDEK AL)
     $('#exportJsonBtn')?.addEventListener('click', async () => {
       const all = await getAllPoems();
       const advStatus = $('#syncAdvStatusText');
@@ -532,88 +532,6 @@
       downloadAnchor.click();
       downloadAnchor.remove();
       if (advStatus) advStatus.textContent = `✓ ${all.length} şiir JSON olarak indirildi.`;
-    });
-
-    // JSON İÇE AKTAR (KEEP / MUNNESİR PARSER)
-    const jsonInput = document.getElementById('jsonFileInput');
-    
-    $('#importJsonBtn')?.addEventListener('click', () => {
-      if (jsonInput) {
-        jsonInput.value = '';
-        jsonInput.click();
-      }
-    });
-
-    jsonInput?.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      const advStatus = document.getElementById('syncAdvStatusText');
-      if (!file) return;
-
-      if (advStatus) advStatus.textContent = '⏳ JSON okunuyor ve veritabanı hazırlanıyor...';
-
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const parsed = JSON.parse(event.target.result);
-          let rawPoems = [];
-
-          if (parsed && Array.isArray(parsed.poems)) rawPoems = parsed.poems;
-          else if (Array.isArray(parsed)) rawPoems = parsed;
-          else if (typeof parsed === 'object') rawPoems = [parsed];
-
-          if (!rawPoems.length) {
-            if (advStatus) advStatus.textContent = '⚠️ Geçerli şiir verisi bulunamadı.';
-            return;
-          }
-
-          const formattedPoems = rawPoems.map((item, idx) => {
-            let tags = Array.isArray(item.tags) ? item.tags.filter(t => t && t !== '(boş)') : [];
-            const contentText = item.content || item.textContent || item.text || '';
-            const titleText = item.title || item.userTitle || 'Başlıksız Şiir';
-
-            const bodyTags = contentText.match(/#([\wğüşıöçGÜŞİÖÇ-]+)/g);
-            if (bodyTags) {
-              bodyTags.forEach(bt => {
-                const cleanTag = bt.replace('#', '').trim();
-                if (cleanTag && !tags.includes(cleanTag)) tags.push(cleanTag);
-              });
-            }
-
-            return {
-              id: item.id || `poem_${Date.now()}_${idx}`,
-              title: titleText,
-              content: contentText,
-              status: item.status || 'ready',
-              favorite: Boolean(item.favorite),
-              source: item.source || 'manual',
-              tags: tags.length ? tags : ['(boş)'],
-              createdAt: item.createdAt || new Date().toISOString(),
-              updatedAt: item.updatedAt || new Date().toISOString()
-            };
-          }).filter(p => p.content && p.content.trim() !== '');
-
-          await openDB();
-          if (!db) {
-            if (advStatus) advStatus.textContent = '❌ Veritabanı bağlantısı kurulamadı.';
-            return;
-          }
-
-          const tx = db.transaction('poems', 'readwrite');
-          const store = tx.objectStore('poems');
-          formattedPoems.forEach(p => store.put(p));
-
-          tx.oncomplete = async () => {
-            await refresh();
-            const allInDb = await getAllPoems();
-            if (advStatus) {
-              advStatus.textContent = `✓ Başarılı! ${formattedPoems.length} şiir yüklendi (Toplam: ${allInDb.length}).`;
-            }
-          };
-        } catch (err) {
-          if (advStatus) advStatus.textContent = '❌ Geçersiz JSON formatı.';
-        }
-      };
-      reader.readAsText(file, 'UTF-8');
     });
 
     // ANDROID & WEB UYUMLU GELİŞMİŞ JSON IMPORT PARSER
@@ -641,7 +559,7 @@
 
           // 1. FORMAT TESPİTİ (Munnesir v1.0, Keep Export, Dizi)
           if (parsed && Array.isArray(parsed.poems)) {
-            rawPoems = parsed.poems; // Tam senin paylaştığın Munnesir yapısı
+            rawPoems = parsed.poems;
           } else if (Array.isArray(parsed)) {
             rawPoems = parsed;
           } else if (typeof parsed === 'object') {
@@ -655,7 +573,6 @@
 
           // 2. VERİ RESTORASYONU VE ETİKET DÜZENLEME
           const formattedPoems = rawPoems.map((item, idx) => {
-            // Etiket Temizliği: "(boş)" olanları ele, metin içindeki #etiket'leri de tara
             let tags = Array.isArray(item.tags) ? item.tags.filter(t => t && t !== '(boş)') : [];
             
             const contentText = item.content || item.textContent || item.text || '';
@@ -684,19 +601,18 @@
           }).filter(p => p.content && p.content.trim() !== '');
 
           // 3. ANDROID WEBVIEW INDEXEDDB YAZMA KİLİDİ
-          await openDB();
-          if (!db) {
+          const currentDb = await openDB();
+          if (!currentDb) {
             if (advStatus) advStatus.textContent = '❌ Veritabanı bağlantısı kurulamadı.';
             return;
           }
 
-          const tx = db.transaction('poems', 'readwrite');
+          const tx = currentDb.transaction('poems', 'readwrite');
           const store = tx.objectStore('poems');
 
           formattedPoems.forEach(p => store.put(p));
 
           tx.oncomplete = async () => {
-            // Bellek Durumunu Güncelle ve Ekranı Yenile
             await refresh();
             const allInDb = await getAllPoems();
             
@@ -704,7 +620,6 @@
               advStatus.textContent = `✓ Başarılı! ${formattedPoems.length} şiir yüklendi (Toplam: ${allInDb.length}).`;
             }
 
-            // Etiket Bulutunu Tekrar Çiz
             if (typeof renderTags === 'function') renderTags();
           };
 

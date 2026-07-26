@@ -448,8 +448,8 @@ html.theme-light #syncStatusText {
 }
 
 
-/* KAPALI DIALOG'LARIN EKRANI KİLİTLEMESİNİ ENGELLEYEN KURAL */
-dialog.modalDialog:not([open]) {
+/* POP-UP'LARIN EKRANI KİLİTLEMESİNİ ENGELLEYEN VE HİZALAYAN NET KURAL */
+dialog.modalDialog {
   display: none !important;
   pointer-events: none !important;
 }
@@ -457,4 +457,10 @@ dialog.modalDialog:not([open]) {
 dialog.modalDialog[open] {
   display: flex !important;
   pointer-events: auto !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  z-index: 2000 !important;
 }
