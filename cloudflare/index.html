@@ -39,19 +39,13 @@
           <input type="search" id="searchInput" class="textInput" placeholder="🔍 Şiir veya etiket ara..." autocomplete="off" name="search_no_autofill" spellcheck="false" />
         </div>
 
-        <!-- SIRALAMA SEÇENEKLERİ (ÖZEL TEMATİK DROPDOWN) -->
+        <!-- SIRALAMA SEÇENEKLERİ (SEKME DÜZENİ) -->
         <div class="navSection">
           <span class="sectionTitle">Sıralama</span>
-          <div class="customDropdown" id="sortCustomDropdown">
-            <button type="button" class="dropdownTrigger" id="sortDropdownBtn">
-              <span id="sortDropdownLabel">Son Düzenlenen</span>
-              <span class="dropdownArrow">❯</span>
-            </button>
-            <div class="dropdownMenu" id="sortDropdownMenu">
-              <div class="dropdownOption active" data-value="updatedDesc">Son Düzenlenen</div>
-              <div class="dropdownOption" data-value="createdDesc">Yeni Eklenen</div>
-              <div class="dropdownOption" data-value="titleAsc">A-Z (Başlığa Göre)</div>
-            </div>
+          <div class="sortTabs" id="sortTabsContainer">
+            <button type="button" class="sortTabBtn active" data-value="updatedDesc">Son Düzenlenen</button>
+            <button type="button" class="sortTabBtn" data-value="createdDesc">Yeni Eklenen</button>
+            <button type="button" class="sortTabBtn" data-value="titleAsc">A-Z</button>
           </div>
         </div>
 

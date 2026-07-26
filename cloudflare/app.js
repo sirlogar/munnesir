@@ -760,35 +760,17 @@
     });
 
 
-    // ÖZEL SIRALAMA DROPDOWN DİNLEYİCİSİ
-    const customDropdown = $('#sortCustomDropdown');
-    const dropdownBtn = $('#sortDropdownBtn');
-    const dropdownLabel = $('#sortDropdownLabel');
-    const dropdownOptions = $$('#sortDropdownMenu .dropdownOption');
-
-    dropdownBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      customDropdown?.classList.toggle('open');
-    });
-
-    dropdownOptions.forEach(opt => {
-      opt.addEventListener('click', (e) => {
+    // SIRALAMA SEKME DİNLEYİCİLERİ
+    const sortTabButtons = $$('#sortTabsContainer .sortTabBtn');
+    sortTabButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        dropdownOptions.forEach(o => o.classList.remove('active'));
-        opt.classList.add('active');
+        sortTabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
 
-        const val = opt.dataset.value;
-        if (dropdownLabel) dropdownLabel.textContent = opt.textContent;
-        state.sortOrder = val;
-        
-        customDropdown?.classList.remove('open');
+        state.sortOrder = btn.dataset.value;
         renderFeed();
       });
-    });
-
-    // Sayfa dışına tıklandığında dropdown'ı kapat
-    document.addEventListener('click', () => {
-      customDropdown?.classList.remove('open');
     });
 
 

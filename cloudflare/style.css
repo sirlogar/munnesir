@@ -543,89 +543,40 @@ dialog#poemDialog .poemContentTextarea {
 }
 
 
-/* DROPDOWN TASARIMI */
-.customDropdown {
-  position: relative;
+/* TEMATİK SIRALAMA SEKTE SEÇENEKLERİ */
+.sortTabs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   width: 100%;
 }
 
-.dropdownTrigger {
+.sortTabBtn {
   width: 100%;
-  height: 42px;
-  padding: 0 14px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
+  justify-content: flex-start;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
-.dropdownTrigger:hover {
-  background: rgba(255, 255, 255, 0.1);
+.sortTabBtn:hover {
+  background: rgba(168, 85, 247, 0.12);
   border-color: var(--accent-color);
 }
 
-.dropdownArrow {
-  font-size: 0.75rem;
-  transition: transform 0.2s ease;
-  color: var(--accent-color);
-  transform: rotate(90deg);
-}
-
-.customDropdown.open .dropdownArrow {
-  transform: rotate(-90deg);
-}
-
-.dropdownMenu {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  background: var(--bg-card, #232330);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 6px;
-  display: none;
-  flex-direction: column;
-  gap: 4px;
-  z-index: 1500;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-}
-
-.customDropdown.open .dropdownMenu {
-  display: flex;
-  animation: dropdownFade 0.2s ease-out forwards;
-}
-
-@keyframes dropdownFade {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.dropdownOption {
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.dropdownOption:hover {
-  background: rgba(168, 85, 247, 0.15);
-  color: var(--accent-color);
-}
-
-.dropdownOption.active {
-  background: var(--accent-color);
-  color: #ffffff;
+.sortTabBtn.active {
+  background: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+  color: #ffffff !important;
   font-weight: 600;
 }
