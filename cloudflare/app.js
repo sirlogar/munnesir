@@ -395,7 +395,7 @@
     applyTheme(localStorage.getItem('munnesir-theme') || 'purple');
 
 
-// GİRİŞ YAP VE SENKRONİZE ET (BULUTTAN KESİN ÇEKİM VE KAYIT FİXİ)
+    // GİRİŞ YAP VE SENKRONİZE ET (GERÇEK CLOUDFLARE SNAPSHOT API BİNDİNG)
     $('#syncSignInBtn')?.addEventListener('click', async () => {
       const passInput = $('#syncPasswordInput');
       const statusEl = $('#syncStatusText');
@@ -406,53 +406,70 @@
         return;
       }
 
-      if (statusEl) statusEl.textContent = '⏳ Senkronize ediliyor ve veriler çekiliyor...';
+      if (statusEl) statusEl.textContent = '⏳ Doğrulanıyor ve senkronize ediliyor...';
 
       try {
-        // 1. Şifreyi Kaydet
+        // 1. Önce /api/auth/login adresine kimlik doğrulaması at
+        const loginRes = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+
+        if (!loginRes.ok) {
+          if (statusEl) statusEl.textContent = '❌ Şifre hatalı!';
+          return;
+        }
+
+        // Şifreyi yerelde sakla
         if (window.Sync && typeof window.Sync.setAuth === 'function') {
           await window.Sync.setAuth(password);
-        } else if (localStorage) {
+        } else {
           localStorage.setItem('munnesir_sync_pass', password);
         }
 
-        // 2. Doğrudan API İsteği At ve Esnek Çözümle
-        let poemsData = [];
-        const res = await fetch('/api/sync', {
+        // 2. Doğrudan Gerçek Snapshot API'sinden (/api/snapshot) Verileri Çek
+        const snapshotRes = await fetch('/api/snapshot', {
           headers: { 'X-Munnesir-Auth': password }
         });
 
-        if (res.ok) {
-          const raw = await res.json();
-          if (Array.isArray(raw)) poemsData = raw;
-          else if (raw && Array.isArray(raw.poems)) poemsData = raw.poems;
-          else if (raw && typeof raw === 'object') poemsData = Object.values(raw).filter(p => p && p.title);
+        if (snapshotRes.ok) {
+          const snapshotData = await snapshotRes.json();
+          let poems = [];
+
+          if (Array.isArray(snapshotData)) poems = snapshotData;
+          else if (snapshotData && Array.isArray(snapshotData.poems)) poems = snapshotData.poems;
+          else if (snapshotData && snapshotData.payloads) {
+            // Snapshot paketleri varsa çöz
+            poems = snapshotData.payloads.flatMap(p => (p.raw && p.raw.poems) ? p.raw.poems : p);
+          }
+
+          if (poems && poems.length > 0) {
+            await window.saveMany(poems);
+            await refresh();
+            if (statusEl) statusEl.textContent = `✓ Senkronizasyon tamam: ${poems.length} şiir çekildi.`;
+            return;
+          }
         }
 
-        // 3. Buluttan Veri Geldiysa IndexedDB'ye Yaz
-        if (poemsData && poemsData.length > 0) {
-          await window.saveMany(poemsData);
-          await refresh();
-          if (statusEl) statusEl.textContent = `✓ Senkronizasyon tamam: ${poemsData.length} şiir senkronize edildi.`;
+        // Fallback: Yerleşik Sync runner'ı çalıştır
+        if (window.Sync && typeof window.Sync.runSync === 'function') {
+          await window.Sync.runSync();
+        }
+
+        await refresh();
+        const allInDb = await getAllPoems();
+        const count = allInDb ? allInDb.length : 0;
+
+        if (count > 0) {
+          if (statusEl) statusEl.textContent = `✓ Senkronizasyon tamam: ${count} şiir yüklendi.`;
         } else {
-          // Eğer API'den boş döndüyse varsayılan Sync.runSync dene
-          if (window.Sync && typeof window.Sync.runSync === 'function') {
-            await window.Sync.runSync();
-          }
-          await refresh();
-          const allInDb = await getAllPoems();
-          const count = allInDb ? allInDb.length : 0;
-          
-          if (count > 0) {
-            if (statusEl) statusEl.textContent = `✓ Senkronizasyon tamam: ${count} şiir senkronize edildi.`;
-          } else {
-            if (statusEl) statusEl.textContent = '⚠️ Bulutta henüz kaydedilmiş şiir bulunamadı. Lütfen "Bu cihazı buluta gönder" diyerek aktarın.';
-          }
+          if (statusEl) statusEl.textContent = '⚠️ Bulutta henüz yedek bulunamadı. "Bu cihazı buluta gönder" butonunu kullanabilirsiniz.';
         }
 
       } catch (err) {
-        console.error('Sync Error:', err);
-        if (statusEl) statusEl.textContent = '❌ Senkronizasyon başarısız. Şifreyi veya ağ bağlantınızı kontrol edin.';
+        console.error('Login/Sync Error:', err);
+        if (statusEl) statusEl.textContent = '❌ Bağlantı hatası. İnternetinizi veya Cloudflare ayarlarınızı kontrol edin.';
       }
     });
 
@@ -502,21 +519,21 @@
       );
     });
 
-    // BULUTTAN ZORLA İNDİR (ŞİİRLERİ KESİN ÇEKER)
+    // BULUTU BU CİHAZA AL (GERÇEK SNAPSHOT INDEX UÇ NOKTASI)
     $('#syncDownloadBtn')?.addEventListener('click', () => {
       showConfirm(
         'Buluttan İndirilsin mi?',
         'Buluttaki tüm şiirleriniz bu cihaza indirilecek ve yerel arşiviniz güncellenecektir. Emin misiniz?',
         async () => {
           const advStatus = $('#syncAdvStatusText');
-          if (advStatus) advStatus.textContent = '⏳ Buluttaki veriler çekiliyor...';
+          if (advStatus) advStatus.textContent = '⏳ Bulut snapshot verileri indiriliyor...';
           try {
             const pass = $('#syncPasswordInput')?.value.trim() || localStorage.getItem('munnesir_sync_pass') || '';
-            const res = await fetch('/api/sync', {
+            const res = await fetch('/api/snapshot', {
               headers: { 'X-Munnesir-Auth': pass }
             });
             
-            if (!res.ok) throw new Error('Yetkilendirme hatası');
+            if (!res.ok) throw new Error('Auth error');
             const data = await res.json();
 
             let fetchedPoems = [];
@@ -526,13 +543,13 @@
             if (fetchedPoems.length > 0) {
               await window.saveMany(fetchedPoems);
               await refresh();
-              if (advStatus) advStatus.textContent = `✓ Başarılı! Buluttan ${fetchedPoems.length} şiir çekildi.`;
+              if (advStatus) advStatus.textContent = `✓ Bulut verileri alındı: ${fetchedPoems.length} şiir yüklendi.`;
             } else {
-              if (advStatus) advStatus.textContent = '⚠️ Bulutta henüz kaydedilmiş şiir bulunamadı.';
+              if (advStatus) advStatus.textContent = '⚠️ Buluttaki snapshot boş.';
             }
           } catch (e) {
             console.error(e);
-            if (advStatus) advStatus.textContent = '❌ Buluttan indirme başarısız. Şifreyi kontrol edin.';
+            if (advStatus) advStatus.textContent = '❌ İndirme başarısız. Şifreyi veya yetkiyi kontrol edin.';
           }
         }
       );
