@@ -141,18 +141,62 @@ body {
 
 .statusFilters { display: flex; flex-direction: column; gap: 8px; }
 
-/* ETİKETLER BULUTU */
-.tagCloud { display: flex; flex-wrap: wrap; gap: 8px; }
+/* ETIKETLER KUTUSU VE ALT ALTA DİKDÖRTGEN TASARIMI */
+.tagCloud {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
 .tagItem {
-  font-size: 0.8rem;
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.08);
+  width: 100%;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  text-align: left;
 }
-.tagItem:hover, .tagItem.active { background: var(--accent-color); color: #fff; }
+
+.tagItem:hover {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: var(--accent-color);
+  transform: translateX(3px);
+}
+
+.tagItem.active {
+  background: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* ETIKET DÜZENLEME KUTUSU (EN ALT) */
+.tagEditBox {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tagEditBox input {
+  height: 36px;
+  font-size: 0.85rem;
+}
+
+
 
 .poemGrid {
   display: grid;

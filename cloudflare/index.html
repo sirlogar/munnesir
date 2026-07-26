@@ -49,10 +49,18 @@
           </select>
         </div>
 
-        <!-- ETİKETLER KUTUSU -->
+
+            <!-- ETİKETLER KUTUSU -->
         <div class="navSection">
           <span class="sectionTitle">Etiketler</span>
           <div id="tagCloud" class="tagCloud"></div>
+
+          <!-- EN ALTTA ETİKET İSMİ DÜZENLEME ALANI -->
+          <div class="tagEditBox" id="tagEditBox" hidden>
+            <span class="sectionTitle" style="font-size:0.7rem; color: var(--accent-color);">Seçili Etiketi Düzenle</span>
+            <input type="text" id="editTagInput" class="textInput" placeholder="Yeni etiket adı..." />
+            <button id="saveTagRenameBtn" class="stdBtn primary full" style="height:34px; font-size:0.8rem;" type="button">İsmi Güncelle</button>
+          </div>
         </div>
 
         <!-- DURUM FİLTRELERİ -->

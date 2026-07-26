@@ -111,24 +111,63 @@
     const container = $('#tagCloud');
     if (!container) return;
     
-    const tagSet = new Set();
+    // Tüm şiirlerden etiketleri ve her etikette kaç şiir olduğunu hesapla
+    const tagCounts = {};
     state.poems.forEach(p => {
-      if (Array.isArray(p.tags)) {
+      if (!p.trashedAt && p.status !== 'trash' && p.status !== 'deleted' && Array.isArray(p.tags)) {
         p.tags.forEach(t => {
-          if (t && t !== '(boş)') tagSet.add(t.trim());
+          if (t && t !== '(boş)') {
+            const clean = t.trim();
+            tagCounts[clean] = (tagCounts[clean] || 0) + 1;
+          }
         });
       }
     });
 
-    const sortedTags = Array.from(tagSet).sort((a, b) => a.localeCompare(b, 'tr'));
+    const sortedTags = Object.keys(tagCounts).sort((a, b) => a.localeCompare(b, 'tr'));
     
-    let html = `<button class="tagChip ${!state.selectedTag ? 'active' : ''}" data-tag="">#(tümü)</button>`;
+    let html = `
+      <button class="tagItem ${!state.selectedTag ? 'active' : ''}" data-tag="">
+        <span>#(tümü)</span>
+        <small style="opacity:0.6;">${state.poems.length}</small>
+      </button>
+    `;
+
     sortedTags.forEach(tag => {
       const active = state.selectedTag === tag ? 'active' : '';
-      html += `<button class="tagChip ${active}" data-tag="${tag}">#${tag}</button>`;
+      html += `
+        <button class="tagItem ${active}" data-tag="${tag}">
+          <span>#${plain(tag)}</span>
+          <small style="opacity:0.6;">${tagCounts[tag]}</small>
+        </button>
+      `;
     });
 
     container.innerHTML = html;
+
+    // Etiket Tıklama Dinleyicilerini Bağla
+    $$('#tagCloud .tagItem').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const clickedTag = btn.dataset.tag;
+        state.selectedTag = clickedTag;
+        
+        // Etiket Düzenleme Kutusunu Göster/Gizle
+        const editBox = $('#tagEditBox');
+        const editInput = $('#editTagInput');
+        if (editBox && editInput) {
+          if (clickedTag) {
+            editBox.hidden = false;
+            editInput.value = clickedTag;
+          } else {
+            editBox.hidden = true;
+          }
+        }
+
+        renderTags();
+        renderFeed();
+      });
+    });
   }
 
   function renderFeed() {
@@ -693,6 +732,38 @@
       reader.readAsText(file, 'UTF-8');
     });
 
+
+    // ETİKET İSMİNİ TÜM ŞİİRLERDE TOPLU GÜNCELLEME VE SENKRONİZE ETME
+    $('#saveTagRenameBtn')?.addEventListener('click', async () => {
+      const oldTag = state.selectedTag;
+      const newTag = $('#editTagInput')?.value.trim();
+
+      if (!oldTag || !newTag || oldTag === newTag) return;
+
+      const advStatus = $('#syncAdvStatusText');
+      let updatedCount = 0;
+
+      // Etikete sahip tüm şiirleri güncelle
+      for (const poem of state.poems) {
+        if (Array.isArray(poem.tags) && poem.tags.includes(oldTag)) {
+          poem.tags = poem.tags.map(t => t === oldTag ? newTag : t);
+          // Metin içindeki #eskiEtiket varsa onu da değiştir
+          if (poem.content) {
+            poem.content = poem.content.replaceAll(`#${oldTag}`, `#${newTag}`);
+          }
+          poem.updatedAt = new Date().toISOString();
+          await savePoemToDB(poem);
+          updatedCount++;
+        }
+      }
+
+      state.selectedTag = newTag;
+      await refresh();
+
+      if (advStatus) {
+        advStatus.textContent = `✓ '${oldTag}' etiketi '${newTag}' olarak değiştirildi (${updatedCount} şiir güncellendi).`;
+      }
+    });
 
 
   }//****** initEvents sonu ******
