@@ -535,7 +535,7 @@
       }
     });
 
-    // BU CİHAZI BULUTA GÖNDER (D1 SNAPSHOT PUT)
+    // BU CİHAZI BULUTA GÖNDER (OTOMATİK OTURUM VE D1 SNAPSHOT PUT)
     $('#syncUploadBtn')?.addEventListener('click', () => {
       showConfirm(
         'Buluta Gönderilsin mi?',
@@ -543,9 +543,41 @@
         async () => {
           const advStatus = $('#syncAdvStatusText');
           if (advStatus) advStatus.textContent = '⏳ Cihaz verileri buluta aktarılıyor...';
+          
           try {
-            const token = localStorage.getItem('munnesir_token') || '';
+            let token = localStorage.getItem('munnesir_token') || localStorage.getItem('munnesir_session') || '';
+            const pass = $('#syncPasswordInput')?.value.trim() || localStorage.getItem('munnesir_sync_pass') || '';
+
+            // 1. Eğer elimizde token yoksa ama şifre varsa, anında oturum açıp token alalım
+            if (!token && pass) {
+              const loginRes = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ password: pass })
+              });
+
+              if (loginRes.ok) {
+                const loginData = await loginRes.json();
+                if (loginData.token) {
+                  token = loginData.token;
+                  localStorage.setItem('munnesir_token', token);
+                }
+              }
+            }
+
+            // 2. Hala token yoksa kullanıcıyı şifre girmeye yönlendir
+            if (!token) {
+              if (advStatus) advStatus.textContent = '❌ Yükleme başarısız. Lütfen önce Ana Ayarlar ekranından Giriş Yapın.';
+              return;
+            }
+
+            // 3. Yerel IndexedDB'deki tüm şiirleri çek
             const allPoems = await getAllPoems();
+
+            if (!allPoems || allPoems.length === 0) {
+              if (advStatus) advStatus.textContent = '⚠️ Yüklenecek şiir bulunamadı. Yerel arşiv boş.';
+              return;
+            }
 
             const payload = {
               app: 'munnesir',
@@ -554,6 +586,7 @@
               poems: allPoems
             };
 
+            // 4. Token ile /api/snapshot endpoint'ine veriyi bas
             const res = await fetch('/api/snapshot', {
               method: 'POST',
               headers: {
@@ -563,10 +596,18 @@
               body: JSON.stringify(payload)
             });
 
-            if (!res.ok) throw new Error('Upload Error');
-            if (advStatus) advStatus.textContent = `✓ ${allPoems.length} şiir başarıyla bulut D1 veritabanına gönderildi.`;
+            if (!res.ok) {
+              const errData = await res.json().catch(() => ({}));
+              throw new Error(errData.error || 'Sunucu kayıt hatası');
+            }
+
+            if (advStatus) {
+              advStatus.textContent = `✓ Başarılı! Yereldeki ${allPoems.length} şiir bulut veritabanına aktarıldı.`;
+            }
+
           } catch (e) {
-            if (advStatus) advStatus.textContent = '❌ Yükleme başarısız. Lütfen önce Giriş Yapın.';
+            console.error('Upload Error:', e);
+            if (advStatus) advStatus.textContent = '❌ Aktarım başarısız. Şifrenizi kontrol edip tekrar giriş yapın.';
           }
         }
       );
