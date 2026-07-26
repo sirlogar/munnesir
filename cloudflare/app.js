@@ -516,7 +516,7 @@
         }
       );
     });
-    
+
 
     // JSON DIŞA AKTAR (YEDEK AL)
     $('#exportJsonBtn')?.addEventListener('click', async () => {
@@ -696,9 +696,5 @@
       window.Sync.init();
     }
   });
-
-})();
-
-
 
 })();

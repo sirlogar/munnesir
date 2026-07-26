@@ -361,35 +361,6 @@ dialog#syncDialog::backdrop {
   background: var(--accent-color);
 }
 
-/* GOOGLE KEEP TARZI GENİŞ YAZMA EDİTÖRÜ */
-dialog#poemDialog {
-  max-width: 850px !important;
-  width: 90vw !important;
-  height: 85vh !important;
-  max-height: 85vh !important;
-  border-radius: 24px !important;
-  background: var(--bg-card) !important;
-  border: 1px solid var(--border-color) !important;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7) !important;
-}
-
-dialog#poemDialog .modalContainer {
-  height: 100% !important;
-  box-sizing: border-box !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  padding: 32px !important;
-}
-
-dialog#poemDialog .poemContentTextarea {
-  flex: 1 !important;
-  height: auto !important;
-  min-height: 50vh !important;
-  font-size: 1.15rem !important;
-  line-height: 1.8 !important;
-  white-space: pre-wrap !important;
-}
 
 /* OKUMA PENCERESİ SATIR KORUMA */
 .readerContent {
@@ -478,7 +449,37 @@ dialog.modalDialog[open] {
   overflow-y: auto !important;
 }
 
-/* ŞİİR EDİTÖRÜ ÖZEL BOYUT */
+
+/* POP-UP'LARIN EKRANI KİLİTLEMESİNİ ENGELLEYEN VE HİZALAYAN NET KURAL */
+dialog.modalDialog {
+  border: none !important;
+  border-radius: 20px !important;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  padding: 0 !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+}
+
+dialog.modalDialog:not([open]) {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+dialog.modalDialog[open] {
+  display: block !important;
+  pointer-events: auto !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  z-index: 2000 !important;
+  width: 90% !important;
+  max-width: 580px !important;
+  max-height: 85vh !important;
+  overflow-y: auto !important;
+}
+
 dialog#poemDialog[open] {
   max-width: 720px !important;
   width: 90% !important;
@@ -486,7 +487,7 @@ dialog#poemDialog[open] {
 
 dialog#poemDialog .poemContentTextarea {
   width: 100% !important;
-  min-height: 300px !important;
+  min-height: 280px !important;
   background: transparent !important;
   border: none !important;
   color: var(--text-primary) !important;
