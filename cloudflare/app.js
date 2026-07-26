@@ -23,8 +23,6 @@
     return `${baseUrl}${endpoint}`;
   }
 
-
-
   function openDB() {
     return new Promise((resolve) => {
       try {
@@ -72,7 +70,6 @@
     });
   }
 
-
   function getPoemDate(p) {
     // Öncelik 1: Şiirin asıl ilk oluşturulma tarihi (createdAt)
     // Öncelik 2: Güncelleme tarihi (updatedAt)
@@ -87,7 +84,6 @@
       year: 'numeric'
     });
   }
-
 
   function formatDate(dStr) {
     if (!dStr) return '';
@@ -111,10 +107,12 @@
     const container = $('#tagCloud');
     if (!container) return;
     
-    // Tüm şiirlerden etiketleri ve her etikette kaç şiir olduğunu hesapla
+    // Yalnızca silinmemiş (aktif) şiirleri filtrele
+    const activePoems = state.poems.filter(p => !p.trashedAt && p.status !== 'trash' && p.status !== 'deleted');
+
     const tagCounts = {};
-    state.poems.forEach(p => {
-      if (!p.trashedAt && p.status !== 'trash' && p.status !== 'deleted' && Array.isArray(p.tags)) {
+    activePoems.forEach(p => {
+      if (Array.isArray(p.tags)) {
         p.tags.forEach(t => {
           if (t && t !== '(boş)') {
             const clean = t.trim();
@@ -126,10 +124,11 @@
 
     const sortedTags = Object.keys(tagCounts).sort((a, b) => a.localeCompare(b, 'tr'));
     
+    // Sayıyı tamamen aktif şiirlerin sayısına eşitle
     let html = `
       <button class="tagItem ${!state.selectedTag ? 'active' : ''}" data-tag="">
         <span>#(tümü)</span>
-        <small style="opacity:0.6;">${state.poems.length}</small>
+        <small style="opacity:0.6;">${activePoems.length}</small>
       </button>
     `;
 
@@ -145,14 +144,13 @@
 
     container.innerHTML = html;
 
-    // Etiket Tıklama Dinleyicilerini Bağla
+    // Etiket Tıklama Dinleyicileri
     $$('#tagCloud .tagItem').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const clickedTag = btn.dataset.tag;
         state.selectedTag = clickedTag;
         
-        // Etiket Düzenleme Kutusunu Göster/Gizle
         const editBox = $('#tagEditBox');
         const editInput = $('#editTagInput');
         if (editBox && editInput) {
@@ -535,7 +533,10 @@
       }
     });
 
-    // BU CİHAZI BULUTA GÖNDER (OTOMATİK OTURUM VE D1 SNAPSHOT PUT)
+
+
+
+    // BU CİHAZI BULUTA GÖNDER (D1 SCHEMA VE OTURUM GARANTİLİ)
     $('#syncUploadBtn')?.addEventListener('click', () => {
       showConfirm(
         'Buluta Gönderilsin mi?',
@@ -545,10 +546,10 @@
           if (advStatus) advStatus.textContent = '⏳ Cihaz verileri buluta aktarılıyor...';
           
           try {
-            let token = localStorage.getItem('munnesir_token') || localStorage.getItem('munnesir_session') || '';
+            let token = localStorage.getItem('munnesir_token') || '';
             const pass = $('#syncPasswordInput')?.value.trim() || localStorage.getItem('munnesir_sync_pass') || '';
 
-            // 1. Eğer elimizde token yoksa ama şifre varsa, anında oturum açıp token alalım
+            // Token yoksa şifreyle anında al
             if (!token && pass) {
               const loginRes = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -565,13 +566,11 @@
               }
             }
 
-            // 2. Hala token yoksa kullanıcıyı şifre girmeye yönlendir
             if (!token) {
-              if (advStatus) advStatus.textContent = '❌ Yükleme başarısız. Lütfen önce Ana Ayarlar ekranından Giriş Yapın.';
+              if (advStatus) advStatus.textContent = '❌ Lütfen Munnesir şifrenizi girip Giriş Yapın.';
               return;
             }
 
-            // 3. Yerel IndexedDB'deki tüm şiirleri çek
             const allPoems = await getAllPoems();
 
             if (!allPoems || allPoems.length === 0) {
@@ -579,14 +578,17 @@
               return;
             }
 
+            // Cloudflare D1 Backend'inin Beklediği Eksiksiz Payload Yapısı
             const payload = {
               app: 'munnesir',
               version: '1.0.1',
+              schema: 3,
               exportedAt: new Date().toISOString(),
-              poems: allPoems
+              poems: allPoems,
+              books: JSON.parse(localStorage.getItem('munnesir-books') || '[]'),
+              deleted: JSON.parse(localStorage.getItem('munnesir-sync-deleted-ids') || '[]')
             };
 
-            // 4. Token ile /api/snapshot endpoint'ine veriyi bas
             const res = await fetch('/api/snapshot', {
               method: 'POST',
               headers: {
@@ -598,16 +600,19 @@
 
             if (!res.ok) {
               const errData = await res.json().catch(() => ({}));
-              throw new Error(errData.error || 'Sunucu kayıt hatası');
+              throw new Error(errData.error || 'D1 veritabanı kayıt hatası');
             }
 
+            const resData = await res.json();
+            const activePoems = allPoems.filter(p => !p.trashedAt && p.status !== 'trash' && p.status !== 'deleted');
+
             if (advStatus) {
-              advStatus.textContent = `✓ Başarılı! Yereldeki ${allPoems.length} şiir bulut veritabanına aktarıldı.`;
+              advStatus.textContent = `✓ Başarılı! ${activePoems.length} şiir bulut veritabanına aktarıldı (Revizyon: ${resData.revision || 1}).`;
             }
 
           } catch (e) {
             console.error('Upload Error:', e);
-            if (advStatus) advStatus.textContent = '❌ Aktarım başarısız. Şifrenizi kontrol edip tekrar giriş yapın.';
+            if (advStatus) advStatus.textContent = `❌ ${e.message || 'Aktarım başarısız. Şifrenizi kontrol edin.'}`;
           }
         }
       );
