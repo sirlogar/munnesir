@@ -17,11 +17,10 @@
 
 // APK İLE AYNI CANLI SUNUCU ADRESİNİ YAKALAYAN KÖPRÜ
   function getApiUrl(endpoint) {
-    // Eğer sync.js içinde tanımlı bir baseUrl varsa onu kullan, yoksa yerel origin'e git
     const baseUrl = (window.Sync && window.Sync.baseUrl) 
       ? window.Sync.baseUrl 
       : (window.location.origin.includes('localhost') || window.location.protocol === 'file:')
-        ? 'https://munnesir.pages.dev' // <--- APK'nın bağlandığı kendi Cloudflare Pages / Worker alan adın
+        ? 'https://SENIN_GUNCEL_DOMAININ.com' // <-- BURAYA ŞU ANKİ AKTİF BACKEND ADRESİNİ YAZ
         : '';
     return `${baseUrl}${endpoint}`;
   }
@@ -591,7 +590,7 @@
 
             // Token yoksa şifreyle anında al
             if (!token && pass) {
-              const loginRes = await fetch(getApiUrl('/api/auth/login'), { // getApiUrl EKLENDİ
+              const loginRes = await fetch(getApiUrl('/api/auth/login'), {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
                 body: JSON.stringify({ password: pass })
@@ -629,7 +628,7 @@
               deleted: JSON.parse(localStorage.getItem('munnesir-sync-deleted-ids') || '[]')
             };
 
-            const res = await fetch(getApiUrl('/api/snapshot'), { // getApiUrl EKLENDİ
+            const loginRes = await fetch(getApiUrl('/api/auth/login'), {
               method: 'POST',
               headers: {
                 'content-type': 'application/json',
@@ -668,7 +667,7 @@
           if (advStatus) advStatus.textContent = '⏳ Snapshot indiriliyor...';
           try {
             const token = localStorage.getItem('munnesir_token') || '';
-            const res = await fetch(getApiUrl('/api/snapshot'), { // getApiUrl EKLENDİ
+            const res = await fetch(getApiUrl('/api/snapshot'), {
               headers: { 'authorization': `Bearer ${token}` }
             });
             
