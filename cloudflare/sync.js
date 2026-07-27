@@ -1,10 +1,9 @@
-// Munnesir 1.0.1 - Cloudflare D1 tek şifreli anlık senkron
-// Web ve APK aynı API'ye bağlanır. Eski JSON yedekleri yerel import ile çalışmaya devam eder.
+// Munnesir 1.0.1 - Cloudflare D1 tek şifreli anlık senkron (Düzeltilmiş Sürüm)
 (function () {
   const CONFIG_KEY = 'munnesir-cloudflare-sync-config';
   const BOOKS_KEY = 'munnesir-books';
   const DELETED_KEY = 'munnesir-sync-deleted-ids';
-  const DEFAULT_API_BASE = 'https://munnesir.com';
+  const DEFAULT_API_BASE = 'https://munnesir.pages.dev'; // <-- Cloudflare canlı adresin
   const POLL_MS = 4500;
   const PUSH_DEBOUNCE_MS = 1200;
 
@@ -23,6 +22,10 @@
   function normalizeBase(value) {
     const raw = String(value || '').trim();
     if (!raw) {
+      // Localhost/Live Server üzerindeysek 405 hatasını engellemek için direkt Cloudflare'a yönlendir
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        return DEFAULT_API_BASE;
+      }
       if (location.protocol === 'http:' || location.protocol === 'https:') return location.origin;
       return DEFAULT_API_BASE;
     }
@@ -75,11 +78,11 @@
 
   function showToast(text) {
     if (typeof window.toast === 'function') window.toast(text);
-    else console.log(text);
+    else console.log(text); 
   }
 
   function setStatus(text, tone) {
-    const el = qs('#syncStatusText');
+    const el = qs('#syncStatusText') || qs('#syncAdvStatusText');
     if (!el) return;
     el.textContent = text;
     el.dataset.tone = tone || 'idle';
@@ -89,12 +92,39 @@
     const cfg = loadConfig();
     const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
     if (cfg.token) headers.Authorization = `Bearer ${cfg.token}`;
-    const res = await fetch(`${cfg.apiBase}${path}`, {
+    
+    let res = await fetch(`${cfg.apiBase}${path}`, {
       method: options.method || 'GET',
       headers,
       body: options.body ? JSON.stringify(options.body) : undefined,
       cache: 'no-store',
     });
+
+    // 401 Unauthorized ise, kaydedilmiş şifreyle otomatik yeniden Token al (Şifre Unutma ve Çökme Fixi)
+    if (res.status === 401 && path !== '/api/auth/login') {
+      const savedPass = localStorage.getItem('munnesir_sync_pass');
+      if (savedPass) {
+         const loginRes = await fetch(`${cfg.apiBase}/api/auth/login`, {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ password: savedPass })
+         });
+         if (loginRes.ok) {
+           const loginData = await loginRes.json();
+           saveConfig({ token: loginData.token });
+           headers.Authorization = `Bearer ${loginData.token}`;
+           
+           // İlk patlayan isteği yeni token ile tekrarla
+           res = await fetch(`${cfg.apiBase}${path}`, {
+             method: options.method || 'GET',
+             headers,
+             body: options.body ? JSON.stringify(options.body) : undefined,
+             cache: 'no-store',
+           });
+         }
+      }
+    }
+
     const text = await res.text();
     const data = text ? safeJsonParse(text, { raw: text }) : {};
     if (!res.ok) {
@@ -116,6 +146,7 @@
       content,
       tags: Array.isArray(p.tags) ? p.tags : (Array.isArray(p.labels) ? p.labels : []),
       status: p.status || 'archive',
+      fontFamily: p.fontFamily || 'font-tinos', 
       favorite: Boolean(p.favorite),
       source: p.source || 'sync',
       createdAt: p.createdAt || p.created_at || stamp(),
@@ -260,7 +291,7 @@
     if (isSyncing) return;
     isSyncing = true;
     try {
-      if (!silent) setStatus('Senkron başlıyor...', 'working');
+      if (!silent) setStatus('⏳ Senkron başlıyor...', 'working');
       const local = await localSnapshot();
       const remote = await fetchCloudSnapshot();
       const merged = mergeSnapshots(local, remote.payload);
@@ -268,8 +299,7 @@
       const result = await uploadSnapshot(merged);
       lastLocalHash = await localHash();
       initialHashReady = true;
-      setStatus(`Senkron tamam: ${merged.poems.length} şiir.`, 'ok');
-      if (!silent) showToast('Bulut senkronu tamamlandı.');
+      setStatus(`✓ Senkron tamam: ${merged.poems.length} şiir.`, 'ok');
       return result;
     } finally {
       isSyncing = false;
@@ -277,26 +307,24 @@
   }
 
   async function uploadLocalOnly() {
-    setStatus('Yerel arşiv buluta gönderiliyor...', 'working');
+    setStatus('⏳ Yerel arşiv buluta gönderiliyor...', 'working');
     const payload = await localSnapshot();
     const result = await uploadSnapshot(payload);
     lastLocalHash = await localHash();
     initialHashReady = true;
-    setStatus('Yerel arşiv buluta gönderildi.', 'ok');
-    showToast('Yerel arşiv buluta gönderildi.');
+    setStatus('✓ Yerel arşiv buluta gönderildi.', 'ok');
     return result;
   }
 
   async function downloadCloudOnly() {
-    setStatus('Bulut arşivi indiriliyor...', 'working');
+    setStatus('⏳ Bulut arşivi indiriliyor...', 'working');
     const row = await fetchCloudSnapshot();
     if (!row || !row.payload) throw new Error('Bulutta henüz Munnesir yedeği yok.');
     await applySnapshot(row.payload);
     saveConfig({ revision: row.revision || 0, lastSyncAt: stamp() });
     lastLocalHash = await localHash();
     initialHashReady = true;
-    setStatus('Bulut arşivi bu cihaza alındı.', 'ok');
-    showToast('Bulut arşivi bu cihaza alındı.');
+    setStatus('✓ Bulut arşivi bu cihaza alındı.', 'ok');
   }
 
   async function runSafely(fn, silent = false) {
@@ -304,8 +332,7 @@
     catch (err) {
       console.error(err);
       const message = err.message || 'Senkron hatası.';
-      setStatus(message, 'error');
-      if (!silent) showToast(message);
+      setStatus(`❌ ${message}`, 'error');
     }
   }
 
@@ -336,16 +363,6 @@
       wrapped.__munnesirPatched = true;
       window[name] = wrapped;
     });
-    if (typeof window.saveBooks === 'function' && !window.saveBooks.__munnesirPatched) {
-      const original = window.saveBooks;
-      const wrapped = function (...args) {
-        const result = original.apply(this, args);
-        scheduleSync();
-        return result;
-      };
-      wrapped.__munnesirPatched = true;
-      window.saveBooks = wrapped;
-    }
   }
 
   async function watchLocalChanges() {
@@ -381,15 +398,8 @@
     setTimeout(() => runSafely(() => syncMerge(true), true), 1600);
   }
 
-  function escapeAttr(value) {
-    return String(value || '').replace(/[&<>'"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[ch]));
-  }
-
   function bindUi() {
-    qs('#syncOpenBtn')?.addEventListener('click', () => qs('#syncDialog')?.showModal());
-    qs('#closeSyncBtn')?.addEventListener('click', () => qs('#syncDialog')?.close());
-    qs('#syncNowBtn')?.addEventListener('click', () => runSafely(() => syncMerge(false)));
-    qs('#syncMergeBtn')?.addEventListener('click', () => runSafely(() => syncMerge(false)));
+    // Arayüzdeki butonları HTML ile eşleyerek tam yetki verdik
     qs('#syncUploadBtn')?.addEventListener('click', () => {
       if (!confirm('Bu cihazdaki arşiv buluttaki kopyanın üzerine yazılsın mı?')) return;
       runSafely(uploadLocalOnly);
@@ -399,25 +409,28 @@
       runSafely(downloadCloudOnly);
     });
     qs('#syncSignInBtn')?.addEventListener('click', () => runSafely(async () => {
-      const apiBase = normalizeBase(qs('#syncBaseInput')?.value || '');
+      const apiBase = normalizeBase();
       const auto = Boolean(qs('#syncAutoInput')?.checked);
       const password = qs('#syncPasswordInput')?.value || '';
       saveConfig({ apiBase, auto });
       const data = await api('/api/auth/login', { method: 'POST', body: { password } });
       saveConfig({ token: data.token || '', revision: Number(data.revision || 0), lastSyncAt: stamp() });
-      qs('#syncPasswordInput').value = '';
-      setStatus('Giriş yapıldı. Anlık senkron açık.', 'ok');
-      showToast('Bulut girişi tamam.');
+      
+      // ŞİFREYİ LOKALDE YEDEKLE
+      localStorage.setItem('munnesir_sync_pass', password);
+      
+      if (qs('#syncPasswordInput')) qs('#syncPasswordInput').value = '';
+      setStatus('✓ Giriş yapıldı. Anlık senkron açık.', 'ok');
       startRealtimeLoop();
       await syncMerge(true);
     }));
     qs('#syncSignOutBtn')?.addEventListener('click', () => {
       saveConfig({ token: '', revision: 0 });
-      setStatus('Çıkış yapıldı.', 'idle');
-      showToast('Buluttan çıkıldı.');
+      localStorage.removeItem('munnesir_sync_pass'); // Şifreyi unut
+      setStatus('⚠️ Çıkış yapıldı. Oturum kapalı.', 'idle');
     });
     qs('#syncAutoInput')?.addEventListener('change', () => {
-      saveConfig({ auto: Boolean(qs('#syncAutoInput')?.checked), apiBase: normalizeBase(qs('#syncBaseInput')?.value || '') });
+      saveConfig({ auto: Boolean(qs('#syncAutoInput')?.checked), apiBase: normalizeBase() });
       startRealtimeLoop();
     });
   }
@@ -430,16 +443,29 @@
     }
     const ok = await api('/api/auth/status').catch(() => null);
     if (ok && ok.ok) {
-      setStatus('Bağlı. Anlık senkron açık.', 'ok');
+      setStatus('✓ Bağlı. Anlık senkron açık.', 'ok');
       saveConfig({ revision: ok.revision || cfg.revision || 0 });
       startRealtimeLoop();
     } else {
-      setStatus('Oturum süresi dolmuş. Şifre ile tekrar gir.', 'error');
+      // Token patlamış ama şifre duruyorsa otomatik giriş yap
+      const savedPass = localStorage.getItem('munnesir_sync_pass');
+      if (savedPass) {
+        setStatus('⏳ Oturum yenileniyor...', 'working');
+        try {
+          const data = await api('/api/auth/login', { method: 'POST', body: { password: savedPass } });
+          saveConfig({ token: data.token || '', revision: Number(data.revision || 0), lastSyncAt: stamp() });
+          setStatus('✓ Bağlı. Anlık senkron açık.', 'ok');
+          startRealtimeLoop();
+        } catch(e) {
+          setStatus('❌ Oturum yenilenemedi. Şifre ile tekrar gir.', 'error');
+        }
+      } else {
+        setStatus('❌ Oturum süresi dolmuş. Şifre ile tekrar gir.', 'error');
+      }
     }
   }
 
   function bootSync() {
-    injectUi();
     bindUi();
     patchLocalMutations();
     restoreStatus();
