@@ -616,3 +616,141 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   -webkit-user-drag: none !important;
   user-drag: none !important;
 }
+
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@600&display=swap');
+
+/* FONT SINIFLARI (YALNIZCA İÇERİKTE UYGULANIR) */
+.font-tinos { font-family: 'Tinos', 'Times New Roman', serif !important; }
+.font-cormorant { font-family: 'Cormorant Garamond', serif !important; }
+.font-playfair { font-family: 'Playfair Display', serif !important; }
+.font-cinzel { font-family: 'Cinzel', serif !important; }
+.font-roboto { font-family: 'Roboto', sans-serif !important; }
+
+/* TAM SAYFA BLOGGER EDİTÖR ALANI */
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: calc(100vh - 120px);
+  padding-bottom: 40px;
+}
+
+.editorHeaderBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: var(--bg-card);
+  padding: 12px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+}
+
+.editorTools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolLabel {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.fontSelect, .statusSelect {
+  height: 36px;
+  width: auto;
+  font-size: 0.85rem;
+}
+
+.editorWordCount {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.editorPaper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 550px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.editorTitleInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.8rem;
+  font-weight: 700;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.editorDivider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 0;
+}
+
+.editorContentArea {
+  width: 100%;
+  flex: 1;
+  min-height: 420px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  line-height: 1.8;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+}
+
+.editorFooterBar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background: var(--bg-card);
+  padding: 12px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+}
+
+.footerRightActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ŞİİR KARTLARI İÇİ SAĞA YASLI AKSİYON PANELİ */
+.cardFooterActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.cardActionBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.cardActionBtn {
+  height: 30px;
+  padding: 0 10px;
+  font-size: 0.78rem;
+  border-radius: 8px;
+}

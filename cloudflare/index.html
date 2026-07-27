@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Munnesir</title>
+  <title>munnesir arsiv</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Tinos:ital,wght@0,400;0,700;1,400&family=Open+Sans:wght@400;600&display=swap">
 </head>
-<body class="theme-purple">
+<body class="theme-black">
 
   <!-- EN ÜST SABİT BANNER -->
   <header class="topBanner">
@@ -82,19 +82,59 @@
       </div>
     </aside>
 
-    <!-- ANA İÇERİK (SAYFA İTİLME ALANI) -->
-    <main class="mainContent" id="mainContent">
+  <!-- MAIN CONTENT with POEM WRITER -->
+  <main class="mainContent" id="mainContent">
+    <!-- ANA AKIŞ (FEED) ALANI -->
+    <div id="feedView">
       <div class="contentHeader">
         <span id="statsLine">0 şiir</span>
       </div>
-
       <section id="poemGrid" class="poemGrid"></section>
       <div id="emptyState" class="emptyState" hidden>
         <h2>Arşiv boş.</h2>
         <p>Sağ alttaki + butonunu kullanarak ilk şiirini ekleyebilirsin.</p>
       </div>
-    </main>
-  </div>
+    </div>
+
+    <!-- BÜYÜK TAM SAYFA BLOGGER YAZMA EDİTÖRÜ -->
+    <div id="editorView" class="editorContainer" hidden>
+      <div class="editorHeaderBar">
+        <button id="closeEditorBtn" class="stdBtn" type="button">← Arşive Dön</button>
+        <div class="editorTools">
+          <label class="toolLabel">Font:</label>
+          <select id="editorFontSelect" class="textInput fontSelect">
+            <option value="font-tinos">Tinos (Klasik Serif)</option>
+            <option value="font-cormorant">Cormorant Garamond (Şiirsel)</option>
+            <option value="font-playfair">Playfair Display (Zarif)</option>
+            <option value="font-cinzel">Cinzel (Epik)</option>
+            <option value="font-roboto">Roboto (Modern Sans)</option>
+          </select>
+          <span id="editorStats" class="editorWordCount">0 kelime | 0 karakter</span>
+        </div>
+      </div>
+
+      <div class="editorPaper">
+        <input id="editorTitleInput" class="editorTitleInput font-tinos" type="text" placeholder="Şiirin Başlığı..." />
+        <hr class="editorDivider" />
+        <textarea id="editorContentInput" class="editorContentArea font-tinos" placeholder="Mısralarınızı yazmaya başlayın... Metin içinde #etiket kullanabilirsiniz."></textarea>
+      </div>
+
+      <!-- EN ALT SAĞA YASLI AKSİYON BAR -->
+      <div class="editorFooterBar">
+        <div class="footerRightActions">
+          <button id="editorAddTagBtn" class="stdBtn" type="button"># Etiket Ekle</button>
+          <button id="editorShareBtn" class="stdBtn" type="button">🔗 Paylaş</button>
+
+          <select id="editorStatusSelect" class="textInput statusSelect">
+            <option value="ready">Yayına Hazır</option>
+            <option value="draft">Taslak</option>
+            <option value="archive">Arşiv</option>
+          </select>
+          <button id="editorSaveBtn" class="stdBtn primary" type="button">💾 Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </main>
 
   <!-- ORTA ALT ŞEFFAF YUKARI/AŞAĞI NAVİGASYON OKLARI -->
   <div class="scrollNavContainer">
@@ -220,22 +260,6 @@
         <p>Çöp kutusu boş.</p>
       </div>
     </div>
-  </dialog>
-
-  <!-- ŞİİR YAZMA EDİTÖRÜ -->
-  <dialog id="poemDialog" class="modalDialog">
-    <form method="dialog" id="poemForm" class="modalContainer">
-      <div class="modalHeader">
-        <input id="poemTitleInput" class="poemTitleInput" type="text" placeholder="Şiir başlığı..." required />
-        <button id="closePoemBtn" class="iconBtn" type="button">✕</button>
-      </div>
-
-      <textarea id="poemContentInput" class="poemContentTextarea font-times" placeholder="Mısralarınızı buraya yazın... (#etiket ekleyebilirsiniz)" required></textarea>
-
-      <div class="modalFooter">
-        <button id="savePoemBtn" class="stdBtn primary" type="submit">Kaydet</button>
-      </div>
-    </form>
   </dialog>
 
   <!-- ŞİİR OKUMA PENCERESİ -->

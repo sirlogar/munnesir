@@ -820,6 +820,65 @@
     });
 
 
+  // TAM TEŞEKKÜLLÜ YAZI EDİTÖRÜ DİNLEYİCİLERİ
+  $('#newPoemFabBtn')?.addEventListener('click', () => showEditor(null));
+  $('#closeEditorBtn')?.addEventListener('click', () => hideEditor());
+
+  $('#editorFontSelect')?.addEventListener('change', (e) => {
+    applyEditorFont(e.target.value);
+  });
+
+  $('#editorContentInput')?.addEventListener('input', () => updateEditorStats());
+
+  $('#editorAddTagBtn')?.addEventListener('click', () => {
+    const input = $('#editorContentInput');
+    if (input) {
+      input.value += ' #yeniEtiket';
+      input.focus();
+      updateEditorStats();
+    }
+  });
+
+  $('#editorShareBtn')?.addEventListener('click', () => {
+    const title = $('#editorTitleInput').value.trim();
+    const content = $('#editorContentInput').value.trim();
+    if (!content) return;
+    const shareText = `${title}\n\n${content}\n\n— Munnesir`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareText).then(() => {
+        alert('Şiir metni kopyalandı!');
+      });
+    }
+  });
+
+  $('#editorSaveBtn')?.addEventListener('click', async () => {
+    const title = $('#editorTitleInput').value.trim() || 'Başlıksız Şiir';
+    const content = $('#editorContentInput').value.trim();
+    if (!content) return;
+
+    const selectedFont = $('#editorFontSelect').value;
+    const selectedStatus = $('#editorStatusSelect').value;
+    const extractedTags = (content.match(/#[\wığüşöçİĞÜŞÖÇ]+/g) || []).map(t => t.replace('#', ''));
+
+    const poemData = {
+      id: currentEditingId || `poem-${Date.now()}`,
+      title,
+      content,
+      tags: extractedTags,
+      fontFamily: selectedFont,
+      status: selectedStatus,
+      updatedAt: new Date().toISOString(),
+      createdAt: currentEditingId ? (state.poems.find(p => p.id === currentEditingId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+      favorite: currentEditingId ? (state.poems.find(p => p.id === currentEditingId)?.favorite || false) : false
+    };
+
+    await savePoemToDB(poemData);
+    hideEditor();
+  });
+  // YAZI EDİTÖRÜ DİNLEYİCİLERİ SONU
+
+
+  
   }//****** initEvents sonu ******
 
 
@@ -895,5 +954,122 @@
       window.Sync.init();
     }
   });
+
+  // STATE GÜNCELLEMESİ
+  let currentEditingId = null;
+
+  function showEditor(poemId = null) {
+    currentEditingId = poemId;
+    $('#feedView').hidden = true;
+    $('#editorView').hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (poemId) {
+      const poem = state.poems.find(p => p.id === poemId);
+      if (poem) {
+        $('#editorTitleInput').value = poem.title || '';
+        $('#editorContentInput').value = poem.content || '';
+        const font = poem.fontFamily || 'font-tinos';
+        $('#editorFontSelect').value = font;
+        applyEditorFont(font);
+        $('#editorStatusSelect').value = poem.status || 'ready';
+      }
+    } else {
+      $('#editorTitleInput').value = '';
+      $('#editorContentInput').value = '';
+      $('#editorFontSelect').value = 'font-tinos';
+      applyEditorFont('font-tinos');
+      $('#editorStatusSelect').value = 'ready';
+    }
+    updateEditorStats();
+  }
+
+  function hideEditor() {
+    $('#editorView').hidden = true;
+    $('#feedView').hidden = false;
+    currentEditingId = null;
+    refresh();
+  }
+
+  function applyEditorFont(fontClass) {
+    const title = $('#editorTitleInput');
+    const content = $('#editorContentInput');
+    if (title && content) {
+      title.className = `editorTitleInput ${fontClass}`;
+      content.className = `editorContentArea ${fontClass}`;
+    }
+  }
+
+  function updateEditorStats() {
+    const content = $('#editorContentInput')?.value || '';
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+    const chars = content.length;
+    const statsEl = $('#editorStats');
+    if (statsEl) statsEl.textContent = `${words} kelime | ${chars} karakter`;
+  }
+
+  // RENDER FEED GÜNCELLEMESİ (KARTLARDA SAĞA YASLI BUTONLAR)
+  function renderFeed() {
+    const grid = $('#poemGrid');
+    const emptyState = $('#emptyState');
+    if (!grid) return;
+
+    let list = state.poems.filter(p => !p.trashedAt && p.status !== 'trash' && p.status !== 'deleted');
+    // ... Filtreleme mantığı aynı kalır ...
+
+    if (!list.length) {
+      grid.innerHTML = '';
+      if (emptyState) emptyState.hidden = false;
+      return;
+    }
+    if (emptyState) emptyState.hidden = true;
+
+    grid.innerHTML = list.map((p) => `
+      <article class="poemCard" data-id="${p.id}">
+        <div class="cardMainClick" onclick="window.openReader('${p.id}')">
+          <h3>${p.favorite ? '★ ' : ''}${plain(p.title)}</h3>
+          <p class="${p.fontFamily || 'font-tinos'}">${plain(p.content).slice(0, 140)}...</p>
+        </div>
+        <div class="cardFooterActions">
+          <span style="font-size:0.75rem; opacity:0.6;">${getPoemDate(p)}</span>
+          <div class="cardActionBtns">
+            <button class="stdBtn cardActionBtn" onclick="window.sharePoem('${p.id}', event)">🔗 Paylaş</button>
+            <button class="stdBtn cardActionBtn" onclick="window.editPoem('${p.id}', event)">✏️ Düzenle</button>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  // GLOBAL DÜZENLEME VE PAYLAŞMA KÖPRÜLERİ
+  window.openReader = function(id) {
+    const poem = state.poems.find(p => p.id === id);
+    if (!poem) return;
+    $('#readerTitle').textContent = poem.title;
+    $('#readerMeta').textContent = formatDate(poem.updatedAt);
+    const content = $('#readerContent');
+    content.textContent = poem.content;
+    content.className = `readerContent ${poem.fontFamily || 'font-tinos'}`;
+    document.body.classList.add('modal-open');
+    $('#readerDialog')?.showModal();
+  };
+
+  window.editPoem = function(id, e) {
+    if (e) e.stopPropagation();
+    showEditor(id);
+  };
+
+  window.sharePoem = function(id, e) {
+    if (e) e.stopPropagation();
+    const poem = state.poems.find(p => p.id === id);
+    if (!poem) return;
+
+    const shareText = `${poem.title}\n\n${poem.content}\n\n— Munnesir`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareText).then(() => {
+        alert('Şiir metni panoya kopyalandı!');
+      });
+    }
+  };
 
 })();
