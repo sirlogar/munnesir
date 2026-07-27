@@ -533,9 +533,6 @@
       }
     });
 
-
-
-
     // BU CİHAZI BULUTA GÖNDER (D1 SCHEMA VE OTURUM GARANTİLİ)
     $('#syncUploadBtn')?.addEventListener('click', () => {
       showConfirm(
@@ -618,7 +615,6 @@
       );
     });
 
-
     // BULUTU BU CİHAZA AL (TOKEN DESTEKLİ)
     $('#syncDownloadBtn')?.addEventListener('click', () => {
       showConfirm(
@@ -651,7 +647,6 @@
         }
       );
     });
-
 
     // JSON DIŞA AKTAR (YEDEK AL)
     $('#exportJsonBtn')?.addEventListener('click', async () => {
@@ -774,7 +769,6 @@
       reader.readAsText(file, 'UTF-8');
     });
 
-
     // ETİKET İSMİNİ TÜM ŞİİRLERDE TOPLU GÜNCELLEME VE SENKRONİZE ETME
     $('#saveTagRenameBtn')?.addEventListener('click', async () => {
       const oldTag = state.selectedTag;
@@ -824,40 +818,45 @@
   $('#newPoemFabBtn')?.addEventListener('click', () => showEditor(null));
   $('#closeEditorBtn')?.addEventListener('click', () => hideEditor());
 
-  $('#editorFontSelect')?.addEventListener('change', (e) => {
-    applyEditorFont(e.target.value);
-  });
+  // FONT DROPDOWN (ÖZEL SEÇİCİ) DİNLEYİCİSİ
+    const fontCustomDropdown = $('#fontCustomDropdown');
+    const fontDropdownBtn = $('#fontDropdownBtn');
+    const fontDropdownLabel = $('#fontDropdownLabel');
+    const fontDropdownOptions = $$('#fontDropdownMenu .dropdownOption');
+
+    fontDropdownBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fontCustomDropdown?.classList.toggle('open');
+    });
+
+    fontDropdownOptions.forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fontDropdownOptions.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+
+        const val = opt.dataset.value;
+        if (fontDropdownLabel) fontDropdownLabel.textContent = opt.textContent;
+        currentSelectedFont = val;
+
+        applyEditorFont(val);
+        fontCustomDropdown?.classList.remove('open');
+      });
+    });
+
+    document.addEventListener('click', () => {
+      fontCustomDropdown?.classList.remove('open');
+    });
 
   $('#editorContentInput')?.addEventListener('input', () => updateEditorStats());
 
-  $('#editorAddTagBtn')?.addEventListener('click', () => {
-    const input = $('#editorContentInput');
-    if (input) {
-      input.value += ' #yeniEtiket';
-      input.focus();
-      updateEditorStats();
-    }
-  });
-
-  $('#editorShareBtn')?.addEventListener('click', () => {
-    const title = $('#editorTitleInput').value.trim();
-    const content = $('#editorContentInput').value.trim();
-    if (!content) return;
-    const shareText = `${title}\n\n${content}\n\n— Munnesir`;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareText).then(() => {
-        alert('Şiir metni kopyalandı!');
-      });
-    }
-  });
-
   $('#editorSaveBtn')?.addEventListener('click', async () => {
-    const title = $('#editorTitleInput').value.trim() || 'Başlıksız Şiir';
-    const content = $('#editorContentInput').value.trim();
+    const title = $('#editorTitleInput')?.value.trim() || 'Başlıksız Şiir';
+    const content = $('#editorContentInput')?.value.trim() || '';
     if (!content) return;
 
-    const selectedFont = $('#editorFontSelect').value;
-    const selectedStatus = $('#editorStatusSelect').value;
+    const selectedFont = currentSelectedFont || 'font-tinos';
+    const selectedStatus = $('#editorStatusSelect')?.value || 'ready';
     const extractedTags = (content.match(/#[\wığüşöçİĞÜŞÖÇ]+/g) || []).map(t => t.replace('#', ''));
 
     const poemData = {
@@ -874,6 +873,29 @@
 
     await savePoemToDB(poemData);
     hideEditor();
+  });
+
+  $('#editorAddTagBtn')?.addEventListener('click', () => {
+    const input = $('#editorContentInput');
+    if (input) {
+      input.value += ' #yeniEtiket';
+      input.focus();
+      updateEditorStats();
+    }
+  });
+
+
+
+  $('#editorShareBtn')?.addEventListener('click', () => {
+    const title = $('#editorTitleInput').value.trim();
+    const content = $('#editorContentInput').value.trim();
+    if (!content) return;
+    const shareText = `${title}\n\n${content}\n\n— Munnesir`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareText).then(() => {
+        alert('Şiir metni kopyalandı!');
+      });
+    }
   });
   // YAZI EDİTÖRÜ DİNLEYİCİLERİ SONU
 
@@ -944,87 +966,6 @@
       await refresh();
     }
   };
-
-
-  // STATE VE BAŞLANGIÇ YÖNETİMİ
-  let currentSelectedFont = 'font-tinos';
-
-  // SAYFA İLK AÇILDIĞINDA EDİTÖRÜ KESİNLİKLE GİZLİ TUT
-  document.addEventListener('DOMContentLoaded', () => {
-    const editor = $('#editorView');
-    const feed = $('#feedView');
-    if (editor) editor.hidden = true;
-    if (feed) feed.hidden = false;
-  });
-
-  // FONT DROPDOWN DİNLEYİCİLERİ
-  const fontCustomDropdown = $('#fontCustomDropdown');
-  const fontDropdownBtn = $('#fontDropdownBtn');
-  const fontDropdownLabel = $('#fontDropdownLabel');
-  const fontDropdownOptions = $$('#fontDropdownMenu .dropdownOption');
-
-  fontDropdownBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    fontCustomDropdown?.classList.toggle('open');
-  });
-
-  fontDropdownOptions.forEach(opt => {
-    opt.addEventListener('click', (e) => {
-      e.stopPropagation();
-      fontDropdownOptions.forEach(o => o.classList.remove('active'));
-      opt.classList.add('active');
-
-      const val = opt.dataset.value;
-      if (fontDropdownLabel) fontDropdownLabel.textContent = opt.textContent;
-      currentSelectedFont = val;
-
-      applyEditorFont(val);
-      fontCustomDropdown?.classList.remove('open');
-    });
-  });
-
-  // Dışarı tıklayınca font dropdown'ı kapat
-  document.addEventListener('click', () => {
-    fontCustomDropdown?.classList.remove('open');
-  });
-
-  function showEditor(poemId = null) {
-    currentEditingId = poemId;
-    $('#feedView').hidden = true;
-    $('#editorView').hidden = false;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    if (poemId) {
-      const poem = state.poems.find(p => p.id === poemId);
-      if (poem) {
-        $('#editorTitleInput').value = poem.title || '';
-        $('#editorContentInput').value = poem.content || '';
-        currentSelectedFont = poem.fontFamily || 'font-tinos';
-        
-        // Dropdown etiketini güncelle
-        const activeOpt = Array.from(fontDropdownOptions).find(o => o.dataset.value === currentSelectedFont);
-        if (activeOpt && fontDropdownLabel) fontDropdownLabel.textContent = activeOpt.textContent;
-        
-        applyEditorFont(currentSelectedFont);
-        $('#editorStatusSelect').value = poem.status || 'ready';
-      }
-    } else {
-      $('#editorTitleInput').value = '';
-      $('#editorContentInput').value = '';
-      currentSelectedFont = 'font-tinos';
-      if (fontDropdownLabel) fontDropdownLabel.textContent = 'Tinos (Klasik Serif)';
-      applyEditorFont('font-tinos');
-      $('#editorStatusSelect').value = 'ready';
-    }
-    updateEditorStats();
-  }
-
-  function hideEditor() {
-    $('#editorView').hidden = true;
-    $('#feedView').hidden = false;
-    currentEditingId = null;
-    refresh();
-  }
 
   function applyEditorFont(fontClass) {
     const title = $('#editorTitleInput');
@@ -1106,5 +1047,18 @@
       });
     }
   };
+
+  // SAYFA İLK AÇILDIĞINDA EDİTÖRÜ KİLİTLE VE FEED'İ GÖSTER
+  document.addEventListener('DOMContentLoaded', async () => {
+    await openDB();
+    initEvents();
+    
+    const editor = $('#editorView');
+    const feed = $('#feedView');
+    if (editor) editor.hidden = true;
+    if (feed) feed.hidden = false;
+
+    await refresh();
+  });
 
 })();

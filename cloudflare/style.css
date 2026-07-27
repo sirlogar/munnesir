@@ -754,3 +754,108 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   font-size: 0.78rem;
   border-radius: 8px;
 }
+
+
+/* ÖZEL TEMATİK DROPDOWN TASARIMI */
+.customDropdown {
+  position: relative;
+  display: inline-block;
+  min-width: 180px;
+}
+
+.dropdownTrigger {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.dropdownTrigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-color);
+}
+
+.dropdownArrow {
+  font-size: 0.7rem;
+  transition: transform 0.2s ease;
+  color: var(--accent-color);
+  transform: rotate(90deg);
+}
+
+.customDropdown.open .dropdownArrow {
+  transform: rotate(-90deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--bg-card, #232330);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 1500;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.customDropdown.open .dropdownMenu {
+  display: flex !important;
+  animation: dropdownFade 0.2s ease-out forwards;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdownOption {
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dropdownOption:hover {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--accent-color);
+}
+
+.dropdownOption.active {
+  background: var(--accent-color);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.customDropdown.open .dropdownMenu {
+  display: flex !important;
+}
+
+
+/* FONT SEÇİCİ DROPDOWN Z-INDEX DÜZELTMESİ */
+.editorHeaderBar .customDropdown {
+  z-index: 2000 !important;
+}
+
+.customDropdown.open .dropdownMenu {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
