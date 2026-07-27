@@ -1,11 +1,14 @@
 (function() {
   let db = null;
+  let currentEditingId = null;
+  let currentSelectedFont = 'font-tinos';
+
   const state = {
     poems: [],
     selectedStatus: 'all',
     selectedTag: '',
     searchQuery: '',
-    poemFont: 'font-times'
+    sortOrder: 'updatedDesc'
   };
 
   const $ = (s) => document.querySelector(s);
@@ -241,27 +244,76 @@
     $('#readerDialog')?.showModal();
   }
 
-  function openEditor() {
-    const dialog = $('#poemDialog');
-    $('#poemTitleInput').value = '';
-    $('#poemContentInput').value = '';
-    delete dialog.dataset.editId;
-    dialog?.showModal();
-  }
-
   function applyTheme(t) {
     const selected = ['light', 'purple', 'black'].includes(t) ? t : 'purple';
     document.documentElement.className = `theme-${selected}`;
     localStorage.setItem('munnesir-theme', selected);
   }
 
+  function showEditor(poemId = null) {
+    currentEditingId = poemId;
+    const feed = $('#feedView');
+    const editor = $('#editorView');
+
+    if (feed) feed.style.display = 'none';
+    if (editor) {
+      editor.hidden = false;
+      editor.style.display = 'flex';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const fontMap = {
+      'font-tinos': 'Tinos (Klasik Serif)',
+      'font-cormorant': 'Cormorant Garamond (Şiirsel)',
+      'font-playfair': 'Playfair Display (Zarif)',
+      'font-cinzel': 'Cinzel (Epik)',
+      'font-roboto': 'Roboto (Modern Sans)'
+    };
+
+    if (poemId) {
+      const poem = state.poems.find(p => p.id === poemId);
+      if (poem) {
+        if ($('#editorTitleInput')) $('#editorTitleInput').value = poem.title || '';
+        if ($('#editorContentInput')) $('#editorContentInput').value = poem.content || '';
+        currentSelectedFont = poem.fontFamily || 'font-tinos';
+        
+        const fontLabel = $('#fontDropdownLabel');
+        if (fontLabel) fontLabel.textContent = fontMap[currentSelectedFont] || 'Tinos (Klasik Serif)';
+        applyEditorFont(currentSelectedFont);
+        // Dropdown menüdeki .active sınıfını güncelle
+        $$('#fontDropdownMenu .dropdownOption').forEach(opt => {
+          opt.classList.toggle('active', opt.dataset.value === currentSelectedFont);
+        });
+        if ($('#editorStatusSelect')) $('#editorStatusSelect').value = poem.status || 'ready';
+      }
+    } else {
+      if ($('#editorTitleInput')) $('#editorTitleInput').value = '';
+      if ($('#editorContentInput')) $('#editorContentInput').value = '';
+      currentSelectedFont = 'font-tinos';
+      if ($('#fontDropdownLabel')) $('#fontDropdownLabel').textContent = 'Tinos (Klasik Serif)';
+      applyEditorFont('font-tinos');
+      if ($('#editorStatusSelect')) $('#editorStatusSelect').value = 'ready';
+    }
+    updateEditorStats();
+  }
+
+  function hideEditor() {
+    const feed = $('#feedView');
+    const editor = $('#editorView');
+    if (editor) {
+      editor.hidden = true;
+      editor.style.display = 'none';
+    }
+    if (feed) feed.style.display = 'block';
+    currentEditingId = null;
+    refresh();
+  }
+
   function initEvents() {
+
     $('#sidebarToggle')?.addEventListener('click', () => {
       $('#sidebar')?.classList.toggle('open');
     });
-
-    $('#newPoemFabBtn')?.addEventListener('click', () => openEditor());
-    $('#closePoemBtn')?.addEventListener('click', () => $('#poemDialog')?.close());
 
     $('#scrollTopBtn')?.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -269,16 +321,6 @@
 
     $('#scrollBottomBtn')?.addEventListener('click', () => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    });
-
-
-    // DETAYLI SENKRONİZASYON POP-UP DİNLEYİCİLERİ
-    $('#openSyncAdvBtn')?.addEventListener('click', () => {
-      $('#syncAdvDialog')?.showModal();
-    });
-
-    $('#closeSyncAdvBtn')?.addEventListener('click', () => {
-      $('#syncAdvDialog')?.close();
     });
 
 
@@ -296,20 +338,19 @@
       $(dialogId)?.showModal();
     };
 
-    // Kapatma Butonları
-    $('#closePoemBtn')?.addEventListener('click', () => closeModal('#poemDialog'));
-    $('#closeReaderBtn')?.addEventListener('click', () => closeModal('#readerDialog'));
-    $('#closeBookBtn')?.addEventListener('click', () => closeModal('#bookDialog'));
-    $('#closeTrashBtn')?.addEventListener('click', () => closeModal('#trashDialog'));
-    $('#closeSettingsBtn')?.addEventListener('click', () => closeModal('#settingsDialog'));
-    $('#closeSyncAdvBtn')?.addEventListener('click', () => closeModal('#syncAdvDialog'));
+// TEKİL MODAL VE EDİTÖR KÖPRÜLERİ
+    $('#newPoemFabBtn')?.addEventListener('click', () => showEditor(null));
+    $('#closeEditorBtn')?.addEventListener('click', () => hideEditor());
 
-    // Açma Butonları
-    $('#newPoemFabBtn')?.addEventListener('click', () => { openEditor(); document.body.classList.add('modal-open'); });
-    $('#bookViewBtn')?.addEventListener('click', () => openModal('#bookDialog'));
-    $('#trashViewBtn')?.addEventListener('click', () => openModal('#trashDialog'));
-    $('#settingsOpenBtn')?.addEventListener('click', () => openModal('#settingsDialog'));
-    $('#openSyncAdvBtn')?.addEventListener('click', () => openModal('#syncAdvDialog'));
+    $('#settingsOpenBtn')?.addEventListener('click', () => $('#settingsDialog')?.showModal());
+    $('#closeSettingsBtn')?.addEventListener('click', () => $('#settingsDialog')?.close());
+
+    $('#openSyncAdvBtn')?.addEventListener('click', () => $('#syncAdvDialog')?.showModal());
+    $('#closeSyncAdvBtn')?.addEventListener('click', () => $('#syncAdvDialog')?.close());
+
+    $('#closeReaderBtn')?.addEventListener('click', () => $('#readerDialog')?.close());
+    $('#closeBookBtn')?.addEventListener('click', () => $('#bookDialog')?.close());
+    $('#closeTrashBtn')?.addEventListener('click', () => $('#trashDialog')?.close());
 
 
     // AUTOFILL (OTOMATİK DOLDURMA) ENGELLEMELİ ARAMA
@@ -346,31 +387,6 @@
       ) {
         e.preventDefault(); // Dışarı tıklansa bile kapanmaz
       }
-    });
-
-
-    $('#poemForm')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const title = $('#poemTitleInput').value.trim();
-      const content = $('#poemContentInput').value.trim();
-      if (!content) return;
-
-      const id = `poem-${Date.now()}`;
-      const extractedTags = (content.match(/#[\wığüşöçİĞÜŞÖÇ]+/g) || []).map(t => t.replace('#', ''));
-
-      const poemData = {
-        id, title, content,
-        tags: extractedTags,
-        updatedAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        status: 'archive',
-        favorite: false
-      };
-
-      await savePoemToDB(poemData);
-      $('#poemDialog')?.close();
-      await refresh();
-
     });
 
 
@@ -421,11 +437,6 @@
       }
       $('#trashDialog')?.showModal();
     });
-
-    $('#closeTrashBtn')?.addEventListener('click', () => $('#trashDialog')?.close());
-    $('#settingsOpenBtn')?.addEventListener('click', () => $('#settingsDialog')?.showModal());
-    $('#closeSettingsBtn')?.addEventListener('click', () => $('#settingsDialog')?.close());
-    $('#closeReaderBtn')?.addEventListener('click', () => $('#readerDialog')?.close());
 
     $$('.themeChoice').forEach(btn => {
       btn.addEventListener('click', () => applyTheme(btn.dataset.themeChoice));
@@ -815,8 +826,8 @@
 
 
   // TAM TEŞEKKÜLLÜ YAZI EDİTÖRÜ DİNLEYİCİLERİ
-  $('#newPoemFabBtn')?.addEventListener('click', () => showEditor(null));
-  $('#closeEditorBtn')?.addEventListener('click', () => hideEditor());
+    $('#newPoemFabBtn')?.addEventListener('click', () => showEditor(null));
+    $('#closeEditorBtn')?.addEventListener('click', () => hideEditor());
 
   // FONT DROPDOWN (ÖZEL SEÇİCİ) DİNLEYİCİSİ
     const fontCustomDropdown = $('#fontCustomDropdown');
@@ -850,6 +861,7 @@
 
   $('#editorContentInput')?.addEventListener('input', () => updateEditorStats());
 
+  // TAM EKRAN EDİTÖR KAYDET BUTONU
   $('#editorSaveBtn')?.addEventListener('click', async () => {
     const title = $('#editorTitleInput')?.value.trim() || 'Başlıksız Şiir';
     const content = $('#editorContentInput')?.value.trim() || '';
@@ -884,8 +896,6 @@
     }
   });
 
-
-
   $('#editorShareBtn')?.addEventListener('click', () => {
     const title = $('#editorTitleInput').value.trim();
     const content = $('#editorContentInput').value.trim();
@@ -899,13 +909,11 @@
   });
   // YAZI EDİTÖRÜ DİNLEYİCİLERİ SONU
 
-
-
   }//****** initEvents sonu ******
 
 
 
-// SYNC VE VERİ TABANI KÖPRÜSÜ (1276 ŞİİRİ EKRANA DÖKER)
+  // SYNC VE VERİ TABANI KÖPRÜSÜ (1276 ŞİİRİ EKRANA DÖKER)
   window.getAllPoems = getAllPoems;
   window.savePoem = savePoemToDB;
   window.refresh = refresh;
@@ -984,39 +992,6 @@
     if (statsEl) statsEl.textContent = `${words} kelime | ${chars} karakter`;
   }
 
-  // RENDER FEED GÜNCELLEMESİ (KARTLARDA SAĞA YASLI BUTONLAR)
-  function renderFeed() {
-    const grid = $('#poemGrid');
-    const emptyState = $('#emptyState');
-    if (!grid) return;
-
-    let list = state.poems.filter(p => !p.trashedAt && p.status !== 'trash' && p.status !== 'deleted');
-    // ... Filtreleme mantığı aynı kalır ...
-
-    if (!list.length) {
-      grid.innerHTML = '';
-      if (emptyState) emptyState.hidden = false;
-      return;
-    }
-    if (emptyState) emptyState.hidden = true;
-
-    grid.innerHTML = list.map((p) => `
-      <article class="poemCard" data-id="${p.id}">
-        <div class="cardMainClick" onclick="window.openReader('${p.id}')">
-          <h3>${p.favorite ? '★ ' : ''}${plain(p.title)}</h3>
-          <p class="${p.fontFamily || 'font-tinos'}">${plain(p.content).slice(0, 140)}...</p>
-        </div>
-        <div class="cardFooterActions">
-          <span style="font-size:0.75rem; opacity:0.6;">${getPoemDate(p)}</span>
-          <div class="cardActionBtns">
-            <button class="stdBtn cardActionBtn" onclick="window.sharePoem('${p.id}', event)">🔗 Paylaş</button>
-            <button class="stdBtn cardActionBtn" onclick="window.editPoem('${p.id}', event)">✏️ Düzenle</button>
-          </div>
-        </div>
-      </article>
-    `).join('');
-  }
-
   // GLOBAL DÜZENLEME VE PAYLAŞMA KÖPRÜLERİ
   window.openReader = function(id) {
     const poem = state.poems.find(p => p.id === id);
@@ -1048,15 +1023,18 @@
     }
   };
 
-  // SAYFA İLK AÇILDIĞINDA EDİTÖRÜ KİLİTLE VE FEED'İ GÖSTER
+// SAYFA İLK AÇILDIĞINDA EDİTÖRÜ GİZLİ TUT, AKIŞI GÖSTER
   document.addEventListener('DOMContentLoaded', async () => {
     await openDB();
     initEvents();
     
     const editor = $('#editorView');
     const feed = $('#feedView');
-    if (editor) editor.hidden = true;
-    if (feed) feed.hidden = false;
+    if (editor) {
+      editor.hidden = true;
+      editor.style.display = 'none';
+    }
+    if (feed) feed.style.display = 'block';
 
     await refresh();
   });
