@@ -96,19 +96,28 @@
       </div>
     </div>
 
-    <!-- BÜYÜK TAM SAYFA BLOGGER YAZMA EDİTÖRÜ -->
+    <!-- BÜYÜK TAM SAYFA BLOGGER YAZMA EDİTÖRÜ (SADECE + VEYA DÜZENLE İLE AÇILIR) -->
     <div id="editorView" class="editorContainer" hidden>
       <div class="editorHeaderBar">
         <button id="closeEditorBtn" class="stdBtn" type="button">← Arşive Dön</button>
         <div class="editorTools">
           <label class="toolLabel">Font:</label>
-          <select id="editorFontSelect" class="textInput fontSelect">
-            <option value="font-tinos">Tinos (Klasik Serif)</option>
-            <option value="font-cormorant">Cormorant Garamond (Şiirsel)</option>
-            <option value="font-playfair">Playfair Display (Zarif)</option>
-            <option value="font-cinzel">Cinzel (Epik)</option>
-            <option value="font-roboto">Roboto (Modern Sans)</option>
-          </select>
+          
+          <!-- TEMATİK ÖZEL FONT DROPDOWN -->
+          <div class="customDropdown" id="fontCustomDropdown">
+            <button type="button" class="dropdownTrigger" id="fontDropdownBtn">
+              <span id="fontDropdownLabel">Tinos (Klasik Serif)</span>
+              <span class="dropdownArrow">❯</span>
+            </button>
+            <div class="dropdownMenu" id="fontDropdownMenu">
+              <div class="dropdownOption active font-tinos" data-value="font-tinos">Tinos (Klasik Serif)</div>
+              <div class="dropdownOption font-cormorant" data-value="font-cormorant">Cormorant Garamond (Şiirsel)</div>
+              <div class="dropdownOption font-playfair" data-value="font-playfair">Playfair Display (Zarif)</div>
+              <div class="dropdownOption font-cinzel" data-value="font-cinzel">Cinzel (Epik)</div>
+              <div class="dropdownOption font-roboto" data-value="font-roboto">Roboto (Modern Sans)</div>
+            </div>
+          </div>
+
           <span id="editorStats" class="editorWordCount">0 kelime | 0 karakter</span>
         </div>
       </div>

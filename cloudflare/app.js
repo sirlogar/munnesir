@@ -878,7 +878,7 @@
   // YAZI EDİTÖRÜ DİNLEYİCİLERİ SONU
 
 
-  
+
   }//****** initEvents sonu ******
 
 
@@ -945,18 +945,48 @@
     }
   };
 
-  // TEMİZ DOM BAŞLATICI
-  document.addEventListener('DOMContentLoaded', async () => {
-    await openDB();
-    initEvents();
-    await refresh();
-    if (window.Sync && typeof window.Sync.init === 'function') {
-      window.Sync.init();
-    }
+
+  // STATE VE BAŞLANGIÇ YÖNETİMİ
+  let currentSelectedFont = 'font-tinos';
+
+  // SAYFA İLK AÇILDIĞINDA EDİTÖRÜ KESİNLİKLE GİZLİ TUT
+  document.addEventListener('DOMContentLoaded', () => {
+    const editor = $('#editorView');
+    const feed = $('#feedView');
+    if (editor) editor.hidden = true;
+    if (feed) feed.hidden = false;
   });
 
-  // STATE GÜNCELLEMESİ
-  let currentEditingId = null;
+  // FONT DROPDOWN DİNLEYİCİLERİ
+  const fontCustomDropdown = $('#fontCustomDropdown');
+  const fontDropdownBtn = $('#fontDropdownBtn');
+  const fontDropdownLabel = $('#fontDropdownLabel');
+  const fontDropdownOptions = $$('#fontDropdownMenu .dropdownOption');
+
+  fontDropdownBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fontCustomDropdown?.classList.toggle('open');
+  });
+
+  fontDropdownOptions.forEach(opt => {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fontDropdownOptions.forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+
+      const val = opt.dataset.value;
+      if (fontDropdownLabel) fontDropdownLabel.textContent = opt.textContent;
+      currentSelectedFont = val;
+
+      applyEditorFont(val);
+      fontCustomDropdown?.classList.remove('open');
+    });
+  });
+
+  // Dışarı tıklayınca font dropdown'ı kapat
+  document.addEventListener('click', () => {
+    fontCustomDropdown?.classList.remove('open');
+  });
 
   function showEditor(poemId = null) {
     currentEditingId = poemId;
@@ -969,15 +999,20 @@
       if (poem) {
         $('#editorTitleInput').value = poem.title || '';
         $('#editorContentInput').value = poem.content || '';
-        const font = poem.fontFamily || 'font-tinos';
-        $('#editorFontSelect').value = font;
-        applyEditorFont(font);
+        currentSelectedFont = poem.fontFamily || 'font-tinos';
+        
+        // Dropdown etiketini güncelle
+        const activeOpt = Array.from(fontDropdownOptions).find(o => o.dataset.value === currentSelectedFont);
+        if (activeOpt && fontDropdownLabel) fontDropdownLabel.textContent = activeOpt.textContent;
+        
+        applyEditorFont(currentSelectedFont);
         $('#editorStatusSelect').value = poem.status || 'ready';
       }
     } else {
       $('#editorTitleInput').value = '';
       $('#editorContentInput').value = '';
-      $('#editorFontSelect').value = 'font-tinos';
+      currentSelectedFont = 'font-tinos';
+      if (fontDropdownLabel) fontDropdownLabel.textContent = 'Tinos (Klasik Serif)';
       applyEditorFont('font-tinos');
       $('#editorStatusSelect').value = 'ready';
     }
