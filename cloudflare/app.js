@@ -336,27 +336,29 @@
 
 
     // ARKA PLAN DONDURMA KÖPRÜLERİ
-    const closeModal = (dialogId) => {
-      $(dialogId)?.close();
-      // Eğer ekranda başka açık modal kalmadıysa arka plan kilidini kaldır
-      if (!document.querySelector('dialog[open]')) {
-        document.body.classList.remove('modal-open');
-      }
-    };
-
     const openModal = (dialogId) => {
       document.body.classList.add('modal-open');
       $(dialogId)?.showModal();
     };
 
-// TEKİL MODAL VE EDİTÖR KÖPRÜLERİ
+    // TÜM MODALLAR İÇİN OTOMATİK SCROLL KİLİDİ AÇICI (ESC tuşu dahil)
+    $$('dialog').forEach(dialog => {
+      dialog.addEventListener('close', () => {
+        // Eğer ekranda başka açık modal kalmadıysa arka plan kilidini kaldır
+        if (!document.querySelector('dialog[open]')) {
+          document.body.classList.remove('modal-open');
+        }
+      });
+    });
+
+    // TEKİL MODAL VE EDİTÖR KÖPRÜLERİ
     $('#newPoemFabBtn')?.addEventListener('click', () => showEditor(null));
     $('#closeEditorBtn')?.addEventListener('click', () => hideEditor());
 
-    $('#settingsOpenBtn')?.addEventListener('click', () => $('#settingsDialog')?.showModal());
+    $('#settingsOpenBtn')?.addEventListener('click', () => openModal('#settingsDialog'));
     $('#closeSettingsBtn')?.addEventListener('click', () => $('#settingsDialog')?.close());
 
-    $('#openSyncAdvBtn')?.addEventListener('click', () => $('#syncAdvDialog')?.showModal());
+    $('#openSyncAdvBtn')?.addEventListener('click', () => openModal('#syncAdvDialog'));
     $('#closeSyncAdvBtn')?.addEventListener('click', () => $('#syncAdvDialog')?.close());
 
     $('#closeReaderBtn')?.addEventListener('click', () => $('#readerDialog')?.close());
