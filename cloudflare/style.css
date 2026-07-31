@@ -631,11 +631,11 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
 .editorContainer {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-width: 900px;
-  margin: 0 auto;
-  min-height: calc(100vh - 120px);
-  padding-bottom: 40px;
+  width: 100%;
+  height: calc(100vh - 60px);
+  margin: 0;
+  padding: 0;
+  background: var(--bg-primary);
 }
 
 .editorHeaderBar {
@@ -644,45 +644,23 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  background: var(--bg-card);
-  padding: 12px 20px;
-  border-radius: 14px;
-  border: 1px solid var(--border-color);
-}
-
-.editorTools {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.toolLabel {
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
-
-.fontSelect, .statusSelect {
-  height: 36px;
-  width: auto;
-  font-size: 0.85rem;
-}
-
-.editorWordCount {
-  font-size: 0.8rem;
-  opacity: 0.6;
-  font-style: italic;
+  background: var(--bg-sidebar);
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .editorPaper {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 32px;
+  flex: 1;
+  background: transparent;
+  padding: 32px 10%;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-height: 550px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  overflow-y: auto;
 }
 
 .editorTitleInput {
@@ -690,10 +668,11 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 700;
   outline: none;
   box-sizing: border-box;
+  padding-bottom: 8px;
 }
 
 .editorDivider {
@@ -705,32 +684,27 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
 .editorContentArea {
   width: 100%;
   flex: 1;
-  min-height: 420px;
+  min-height: 400px; /* İçerik kısayken de yeterli alan kalsın */
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   line-height: 1.8;
   outline: none;
-  resize: vertical;
+  resize: none;
   box-sizing: border-box;
   white-space: pre-wrap;
+  overflow-y: hidden; /* Scroll'u .editorPaper yönetecek */
 }
 
 .editorFooterBar {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  background: var(--bg-card);
-  padding: 12px 20px;
-  border-radius: 14px;
-  border: 1px solid var(--border-color);
-}
-
-.footerRightActions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  background: var(--bg-sidebar);
+  padding: 12px 32px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 /* ŞİİR KARTLARI İÇİ SAĞA YASLI AKSİYON PANELİ */

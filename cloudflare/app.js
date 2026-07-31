@@ -232,6 +232,12 @@
     `).join('');
   }
 
+  function applyTheme(t) {
+  const selected = ['light', 'purple', 'black'].includes(t) ? t : 'purple';
+  document.documentElement.className = `theme-${selected}`;
+  localStorage.setItem('munnesir-theme', selected);
+  }
+
   function openReader(id) {
     const poem = state.poems.find(p => p.id === id);
     if (!poem) return;
@@ -240,22 +246,23 @@
     $('#readerMeta').textContent = formatDate(poem.updatedAt);
     const content = $('#readerContent');
     content.textContent = poem.content;
-    content.className = `readerContent ${state.poemFont}`;
+    
+    // FONT HATASI FIXLENDI: Şiirin kendi fontunu çeker
+    content.className = `readerContent ${poem.fontFamily || 'font-tinos'}`;
 
-    document.body.classList.add('modal-open'); // Arka planı dondur
+    document.body.classList.add('modal-open');
     $('#readerDialog')?.showModal();
-  }
-
-  function applyTheme(t) {
-    const selected = ['light', 'purple', 'black'].includes(t) ? t : 'purple';
-    document.documentElement.className = `theme-${selected}`;
-    localStorage.setItem('munnesir-theme', selected);
   }
 
   function showEditor(poemId = null) {
     currentEditingId = poemId;
     const feed = $('#feedView');
     const editor = $('#editorView');
+
+    // TAM EKRAN İÇİN DİNAMİK DOLGU VE SCROLL KİLİDİ
+    const mainContent = $('#mainContent');
+    if (mainContent) mainContent.style.padding = '0';
+    document.body.style.overflow = 'hidden';
 
     if (feed) {
       feed.hidden = true;
@@ -266,7 +273,6 @@
       editor.removeAttribute('hidden');
       editor.style.display = 'flex';
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     const fontMap = {
       'font-tinos': 'Tinos (Klasik Serif)',
@@ -306,6 +312,12 @@
   function hideEditor() {
     const feed = $('#feedView');
     const editor = $('#editorView');
+
+    // TAM EKRANDAN ÇIKIŞTA DOLGU VE SCROLL GERİ GELİR
+    const mainContent = $('#mainContent');
+    if (mainContent) mainContent.style.padding = '';
+    document.body.style.overflow = '';
+
     if (editor) {
       editor.hidden = true;
       editor.setAttribute('hidden', '');
@@ -666,6 +678,7 @@
   $('#editorContentInput')?.addEventListener('input', () => updateEditorStats());
 
   // TAM EKRAN EDİTÖR KAYDET BUTONU
+// TAM EKRAN EDİTÖR KAYDET BUTONU (KAPANMAZ, GÜNCELLER)
   $('#editorSaveBtn')?.addEventListener('click', async () => {
     const title = $('#editorTitleInput')?.value.trim() || 'Başlıksız Şiir';
     const content = $('#editorContentInput')?.value.trim() || '';
@@ -688,7 +701,21 @@
     };
 
     await savePoemToDB(poemData);
-    hideEditor();
+    
+    // Editörü kapatmıyoruz, ID'yi sabitliyoruz ki üstüne kaydetmeye devam etsin
+    currentEditingId = poemData.id; 
+    refresh(); // Arka planda listeyi günceller
+
+    // Görsel Geri Bildirim
+    const saveBtn = $('#editorSaveBtn');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = '✓ Kaydedildi';
+    saveBtn.classList.add('active');
+    
+    setTimeout(() => {
+      saveBtn.innerHTML = originalText;
+      saveBtn.classList.remove('active');
+    }, 2000);
   });
 
   $('#editorAddTagBtn')?.addEventListener('click', () => {
