@@ -96,54 +96,43 @@
       </div>
     </div>
 
-    <!-- BÜYÜK TAM SAYFA BLOGGER YAZMA EDİTÖRÜ (SADECE + VEYA DÜZENLE İLE AÇILIR) -->
-    <div id="editorView" class="editorContainer" style="display: none;" hidden>
-      <div class="editorHeaderBar">
+  <!-- TAM SAYFA BLOGGER YAZMA EDİTÖRÜ -->
+  <div id="editorView" class="editorContainer" style="display: none;" hidden>
+    
+    <!-- ÜST KONTROL BARI -->
+    <div class="editorHeaderBar">
+      <div class="headerLeft">
         <button id="closeEditorBtn" class="stdBtn" type="button">← Arşive Dön</button>
-        <div class="editorTools">
-          <label class="toolLabel">Font:</label>
-          
-          <!-- TEMATİK ÖZEL FONT DROPDOWN -->
-          <div class="customDropdown" id="fontCustomDropdown">
-            <button type="button" class="dropdownTrigger" id="fontDropdownBtn">
-              <span id="fontDropdownLabel">Tinos (Klasik Serif)</span>
-              <span class="dropdownArrow">❯</span>
-            </button>
-            <div class="dropdownMenu" id="fontDropdownMenu">
-              <div class="dropdownOption active font-tinos" data-value="font-tinos">Tinos (Klasik Serif)</div>
-              <div class="dropdownOption font-cormorant" data-value="font-cormorant">Cormorant Garamond (Şiirsel)</div>
-              <div class="dropdownOption font-playfair" data-value="font-playfair">Playfair Display (Zarif)</div>
-              <div class="dropdownOption font-cinzel" data-value="font-cinzel">Cinzel (Epik)</div>
-              <div class="dropdownOption font-roboto" data-value="font-roboto">Roboto (Modern Sans)</div>
-            </div>
-          </div>
-
-          <span id="editorStats" class="editorWordCount">0 kelime | 0 karakter</span>
-        </div>
       </div>
-
-      <div class="editorPaper">
-        <input id="editorTitleInput" class="editorTitleInput font-tinos" type="text" placeholder="Şiirin Başlığı..." />
-        <hr class="editorDivider" />
-        <textarea id="editorContentInput" class="editorContentArea font-tinos" placeholder="Mısralarınızı yazmaya başlayın... Metin içinde #etiket kullanabilirsiniz."></textarea>
-      </div>
-
-      <!-- EN ALT SAĞA YASLI AKSİYON BAR -->
-      <div class="editorFooterBar">
-        <div class="footerRightActions">
-          <button id="editorAddTagBtn" class="stdBtn" type="button"># Etiket Ekle</button>
-          <button id="editorShareBtn" class="stdBtn" type="button">🔗 Paylaş</button>
-
-          <select id="editorStatusSelect" class="textInput statusSelect">
-            <option value="ready">Yayına Hazır</option>
-            <option value="draft">Taslak</option>
-            <option value="archive">Arşiv</option>
-          </select>
-          <button id="editorSaveBtn" class="stdBtn primary" type="button">💾 Kaydet</button>
-        </div>
+      <div class="headerRight">
+        <span id="editorStats" class="editorWordCount">0 kelime | 0 karakter</span>
+        <select id="editorStatusSelect" class="textInput statusSelect" style="width: auto;">
+          <option value="ready">Yayına Hazır</option>
+          <option value="draft">Taslak</option>
+          <option value="archive">Arşiv</option>
+        </select>
+        <button id="editorSaveBtn" class="stdBtn primary" type="button">💾 Kaydet</button>
       </div>
     </div>
-  </main>
+
+    <!-- DEVASA YAZMA ALANI (KAĞIT) -->
+    <div class="editorPaper">
+      <input id="editorTitleInput" class="editorTitleInput font-tinos" type="text" placeholder="Şiirin Başlığı..." />
+      <hr class="editorDivider" />
+      <textarea id="editorContentInput" class="editorContentArea font-tinos" placeholder="Mısralarınızı yazmaya başlayın... Metin içinde #etiket kullanabilirsiniz."></textarea>
+    </div>
+
+    <!-- ALT ARAÇ ÇUBUĞU -->
+    <div class="editorFooterBar">
+      <div class="footerLeft">
+        <button id="editorAddTagBtn" class="stdBtn" type="button"># Etiket Ekle</button>
+      </div>
+      <div class="footerRight">
+        <button id="editorShareBtn" class="stdBtn" type="button">🔗 Paylaş</button>
+      </div>
+    </div>
+    
+  </div>
 
   <!-- ORTA ALT ŞEFFAF YUKARI/AŞAĞI NAVİGASYON OKLARI -->
   <div class="scrollNavContainer">

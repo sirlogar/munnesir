@@ -632,35 +632,36 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 60px); /* Üst banner hariç tam ekran */
   margin: 0;
   padding: 0;
   background: var(--bg-primary);
+  overflow: hidden; /* Dış alanın kaymasını tamamen kilitler */
 }
 
 .editorHeaderBar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  background: var(--bg-sidebar);
   padding: 12px 32px;
+  background: var(--bg-sidebar);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .editorPaper {
   flex: 1;
-  background: transparent;
-  padding: 32px 10%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
-  overflow-y: auto;
+  padding: 30px 10%;
+  background: transparent;
+  overflow-y: auto; /* SADECE şiir alanı kayar */
 }
 
 .editorTitleInput {
@@ -668,23 +669,23 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
   outline: none;
-  box-sizing: border-box;
-  padding-bottom: 8px;
+  padding-bottom: 15px;
+  font-family: inherit;
 }
 
 .editorDivider {
+  width: 100%;
   border: none;
   border-top: 1px solid var(--border-color);
-  margin: 0;
+  margin: 0 0 20px 0;
 }
 
 .editorContentArea {
-  width: 100%;
   flex: 1;
-  min-height: 400px; /* İçerik kısayken de yeterli alan kalsın */
+  width: 100%;
   background: transparent;
   border: none;
   color: var(--text-primary);
@@ -692,17 +693,16 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   line-height: 1.8;
   outline: none;
   resize: none;
-  box-sizing: border-box;
-  white-space: pre-wrap;
-  overflow-y: hidden; /* Scroll'u .editorPaper yönetecek */
+  font-family: inherit;
+  padding-bottom: 60px;
 }
 
 .editorFooterBar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  background: var(--bg-sidebar);
   padding: 12px 32px;
+  background: var(--bg-sidebar);
   border-top: 1px solid var(--border-color);
   flex-shrink: 0;
 }

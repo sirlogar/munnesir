@@ -254,56 +254,36 @@
     $('#readerDialog')?.showModal();
   }
 
-  function showEditor(poemId = null) {
+function showEditor(poemId = null) {
     currentEditingId = poemId;
     const feed = $('#feedView');
     const editor = $('#editorView');
 
-    // TAM EKRAN İÇİN DİNAMİK DOLGU VE SCROLL KİLİDİ
-    const mainContent = $('#mainContent');
-    if (mainContent) mainContent.style.padding = '0';
+    // Akışı, Okları ve + butonunu gizle
+    if (feed) feed.style.display = 'none';
+    const scrollNav = $('.scrollNavContainer');
+    if (scrollNav) scrollNav.style.display = 'none';
+    const fabBtn = $('#newPoemFabBtn');
+    if (fabBtn) fabBtn.style.display = 'none';
+
     document.body.style.overflow = 'hidden';
 
-    if (feed) {
-      feed.hidden = true;
-      feed.style.display = 'none';
-    }
     if (editor) {
       editor.hidden = false;
       editor.removeAttribute('hidden');
       editor.style.display = 'flex';
     }
 
-    const fontMap = {
-      'font-tinos': 'Tinos (Klasik Serif)',
-      'font-cormorant': 'Cormorant Garamond (Şiirsel)',
-      'font-playfair': 'Playfair Display (Zarif)',
-      'font-cinzel': 'Cinzel (Epik)',
-      'font-roboto': 'Roboto (Modern Sans)'
-    };
-
     if (poemId) {
       const poem = state.poems.find(p => p.id === poemId);
       if (poem) {
         if ($('#editorTitleInput')) $('#editorTitleInput').value = poem.title || '';
         if ($('#editorContentInput')) $('#editorContentInput').value = poem.content || '';
-        currentSelectedFont = poem.fontFamily || 'font-tinos';
-        
-        const fontLabel = $('#fontDropdownLabel');
-        if (fontLabel) fontLabel.textContent = fontMap[currentSelectedFont] || 'Tinos (Klasik Serif)';
-        applyEditorFont(currentSelectedFont);
-        
-        $$('#fontDropdownMenu .dropdownOption').forEach(opt => {
-          opt.classList.toggle('active', opt.dataset.value === currentSelectedFont);
-        });
         if ($('#editorStatusSelect')) $('#editorStatusSelect').value = poem.status || 'ready';
       }
     } else {
       if ($('#editorTitleInput')) $('#editorTitleInput').value = '';
       if ($('#editorContentInput')) $('#editorContentInput').value = '';
-      currentSelectedFont = 'font-tinos';
-      if ($('#fontDropdownLabel')) $('#fontDropdownLabel').textContent = 'Tinos (Klasik Serif)';
-      applyEditorFont('font-tinos');
       if ($('#editorStatusSelect')) $('#editorStatusSelect').value = 'ready';
     }
     updateEditorStats();
@@ -313,21 +293,20 @@
     const feed = $('#feedView');
     const editor = $('#editorView');
 
-    // TAM EKRANDAN ÇIKIŞTA DOLGU VE SCROLL GERİ GELİR
-    const mainContent = $('#mainContent');
-    if (mainContent) mainContent.style.padding = '';
+    // Okları ve + butonunu geri getir
     document.body.style.overflow = '';
+    const scrollNav = $('.scrollNavContainer');
+    if (scrollNav) scrollNav.style.display = 'flex';
+    const fabBtn = $('#newPoemFabBtn');
+    if (fabBtn) fabBtn.style.display = 'flex';
 
     if (editor) {
       editor.hidden = true;
       editor.setAttribute('hidden', '');
       editor.style.display = 'none';
     }
-    if (feed) {
-      feed.hidden = false;
-      feed.removeAttribute('hidden');
-      feed.style.display = 'block';
-    }
+    if (feed) feed.style.display = 'block';
+    
     currentEditingId = null;
     refresh();
   }
@@ -645,55 +624,28 @@
       });
     });
 
-  // FONT DROPDOWN (ÖZEL SEÇİCİ) DİNLEYİCİSİ
-    const fontCustomDropdown = $('#fontCustomDropdown');
-    const fontDropdownBtn = $('#fontDropdownBtn');
-    const fontDropdownLabel = $('#fontDropdownLabel');
-    const fontDropdownOptions = $$('#fontDropdownMenu .dropdownOption');
-
-    fontDropdownBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      fontCustomDropdown?.classList.toggle('open');
-    });
-
-    fontDropdownOptions.forEach(opt => {
-      opt.addEventListener('click', (e) => {
-        e.stopPropagation();
-        fontDropdownOptions.forEach(o => o.classList.remove('active'));
-        opt.classList.add('active');
-
-        const val = opt.dataset.value;
-        if (fontDropdownLabel) fontDropdownLabel.textContent = opt.textContent;
-        currentSelectedFont = val;
-
-        applyEditorFont(val);
-        fontCustomDropdown?.classList.remove('open');
-      });
-    });
-
-    document.addEventListener('click', () => {
-      fontCustomDropdown?.classList.remove('open');
-    });
-
-  $('#editorContentInput')?.addEventListener('input', () => updateEditorStats());
-
   // TAM EKRAN EDİTÖR KAYDET BUTONU
-// TAM EKRAN EDİTÖR KAYDET BUTONU (KAPANMAZ, GÜNCELLER)
   $('#editorSaveBtn')?.addEventListener('click', async () => {
     const title = $('#editorTitleInput')?.value.trim() || 'Başlıksız Şiir';
     const content = $('#editorContentInput')?.value.trim() || '';
     if (!content) return;
 
-    const selectedFont = currentSelectedFont || 'font-tinos';
     const selectedStatus = $('#editorStatusSelect')?.value || 'ready';
     const extractedTags = (content.match(/#[\wığüşöçİĞÜŞÖÇ]+/g) || []).map(t => t.replace('#', ''));
+
+    // Eski şiirin fontunu koru, yeni şiirse Tinos yap
+    let existingFont = 'font-tinos';
+    if (currentEditingId) {
+      const oldPoem = state.poems.find(p => p.id === currentEditingId);
+      if (oldPoem && oldPoem.fontFamily) existingFont = oldPoem.fontFamily;
+    }
 
     const poemData = {
       id: currentEditingId || `poem-${Date.now()}`,
       title,
       content,
       tags: extractedTags,
-      fontFamily: selectedFont,
+      fontFamily: existingFont,
       status: selectedStatus,
       updatedAt: new Date().toISOString(),
       createdAt: currentEditingId ? (state.poems.find(p => p.id === currentEditingId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
@@ -702,9 +654,9 @@
 
     await savePoemToDB(poemData);
     
-    // Editörü kapatmıyoruz, ID'yi sabitliyoruz ki üstüne kaydetmeye devam etsin
+    // ID'yi sabit tut, editörü kapatma
     currentEditingId = poemData.id; 
-    refresh(); // Arka planda listeyi günceller
+    refresh(); 
 
     // Görsel Geri Bildirim
     const saveBtn = $('#editorSaveBtn');
