@@ -629,14 +629,17 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
 
 /* TAM SAYFA BLOGGER EDİTÖR ALANI */
 .editorContainer {
+  position: fixed; /* Ekranı tam kaplaması için mutlak kilit */
+  top: 60px; /* Üst bannerın hemen altından başlar */
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: calc(100vh - 60px); /* Üst banner hariç tam ekran */
-  margin: 0;
-  padding: 0;
   background: var(--bg-primary);
-  overflow: hidden; /* Dış alanın kaymasını tamamen kilitler */
+  z-index: 1050; /* Her şeyin üstüne çıkması için */
+  overflow: hidden; /* Dışarı taşmaları jilet gibi keser */
+  box-sizing: border-box;
 }
 
 .editorHeaderBar {
@@ -647,6 +650,8 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   background: var(--bg-sidebar);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .headerRight {
@@ -662,6 +667,8 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   padding: 30px 10%;
   background: transparent;
   overflow-y: auto; /* SADECE şiir alanı kayar */
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .editorTitleInput {
@@ -674,6 +681,7 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   outline: none;
   padding-bottom: 15px;
   font-family: inherit;
+  box-sizing: border-box;
 }
 
 .editorDivider {
@@ -681,6 +689,7 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   border: none;
   border-top: 1px solid var(--border-color);
   margin: 0 0 20px 0;
+  box-sizing: border-box;
 }
 
 .editorContentArea {
@@ -695,6 +704,7 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   resize: none;
   font-family: inherit;
   padding-bottom: 60px;
+  box-sizing: border-box;
 }
 
 .editorFooterBar {
@@ -705,6 +715,8 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   background: var(--bg-sidebar);
   border-top: 1px solid var(--border-color);
   flex-shrink: 0;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* ŞİİR KARTLARI İÇİ SAĞA YASLI AKSİYON PANELİ */
