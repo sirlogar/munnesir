@@ -845,3 +845,12 @@ img, button, svg, .iconBtn, .brandLogo, .stdBtn, .sortTabBtn, .tagItem {
   opacity: 1 !important;
   visibility: visible !important;
 }
+
+
+/* YERLEŞİK AÇILIR MENÜYÜ KARANLIK MODA ZORLAMA */
+select.selectInput, select.statusSelect {
+  color-scheme: dark;
+  background-color: var(--bg-sidebar) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px;
+}
